@@ -249,8 +249,8 @@ const MidiController: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-black via-zinc-900 to-black p-4 md:p-6">
       <div className="max-w-6xl mx-auto space-y-6">
         <div className="text-center">
-          <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">MIDI Controller</h1>
-          <p className="text-zinc-300">Web-based synthesizer with realistic piano sounds</p>
+          <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">WEB MIDI MUSIC</h1>
+          <p className="text-zinc-300">synthesizer. piano. drumb machine.</p>
         </div>
 
         {/* Control Panel */}
