@@ -256,7 +256,7 @@ const MidiController: React.FC = () => {
         {/* Control Panel */}
         <Card className="bg-zinc-900/95 border-zinc-700 backdrop-blur-sm">
           <CardHeader className="pb-4">
-            <CardTitle className="text-white text-xl">JRs Web Midi v1.0</CardTitle>
+            <CardTitle className="text-white text-xl">JRs Midi v1.0</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             {/* Sound Mode Selection */}
@@ -385,10 +385,10 @@ const MidiController: React.FC = () => {
             {!isPlaying && (
               <Button
                 onClick={startAudio}
-                className="w-full bg-zinc-700 hover:bg-zinc-600 text-white font-medium py-3 text-base"
+                className="w-full bg-indigo-400 hover:bg-cyan-400 text-white font-medium py-3 text-base"
                 size="lg"
               >
-                🎵 initialize Audio
+                initialize audio
               </Button>
             )}
           </CardContent>
@@ -414,8 +414,8 @@ const MidiController: React.FC = () => {
         <Card className="bg-zinc-900/95 border-zinc-700 backdrop-blur-sm">
           <CardContent className="pt-6 space-y-4">
             <p className="text-zinc-200 text-center text-base">
-              Play notes by clicking the piano keys or using your computer keyboard. You may need to click{" "}
-              <strong>"Initialize Audio"</strong> first due to browser audio policies.
+              play notes by clicking the piano keys or using your computer keyboard. NO sound? click{" "}
+              <strong>"initialize Audio"</strong> due to browser restrictions.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
               <div className="bg-zinc-800/60 p-4 rounded-lg border border-zinc-700">
@@ -451,14 +451,14 @@ const MidiController: React.FC = () => {
         {/* Footer */}
         <div className="text-center py-6">
           <p className="text-zinc-500 text-sm">
-            web midi controller by{" "}
+           JRs web midi{" "}
             <a
               href="https://github.com/sudo-self/midi-controller"
               target="_blank"
               rel="noopener noreferrer"
               className="text-zinc-300 hover:text-white transition-colors duration-200 font-medium"
             >
-              sudo-self
+            controller
             </a>
           </p>
         </div>
