@@ -19,7 +19,6 @@ const DrumMachine: React.FC<DrumMachineProps> = ({ audioContext, masterGain }) =
   const [activeKit, setActiveKit] = useState<KitType>("kit1")
   const activeNodesRef = useRef<Map<DrumSound, AudioBufferSourceNode>>(new Map())
 
-  // KIT 1 Sounds (Original)
   const createKick = (ctx: AudioContext, destination: AudioNode) => {
     const osc = ctx.createOscillator()
     const gain = ctx.createGain()
