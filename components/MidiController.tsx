@@ -10,7 +10,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import LoopRecorder from "./LoopRecorder"
 import DrumMachine from "./DrumMachine"
 
-
 interface AudioSettings {
   volume: number
   attack: number
@@ -247,220 +246,339 @@ const MidiController: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-zinc-900 to-black p-4 md:p-6">
-      <div className="max-w-6xl mx-auto space-y-6">
-        <div className="text-center">
-          <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">WEB MIDI MUSIC</h1>
-          <p className="text-zinc-300">synthesizer. piano. drum machines.</p>
+    <div className="min-h-screen bg-gradient-to-b from-black via-zinc-950 to-black p-3 md:p-5">
+      <div className="max-w-7xl mx-auto space-y-5">
+        {/* Header with DJ-style branding */}
+        <div className="text-center space-y-2">
+          <div className="relative">
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-indigo-500/20 to-transparent blur-xl"></div>
+            <h1 className="relative text-4xl md:text-5xl font-bold bg-gradient-to-r from-indigo-400 via-cyan-400 to-purple-400 bg-clip-text text-transparent mb-2">
+              WEB MIDI MUSIC
+            </h1>
+          </div>
+          <div className="flex items-center justify-center gap-3 text-zinc-300">
+            <div className="flex items-center gap-1">
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+              <span className="text-sm">LIVE</span>
+            </div>
+            <span className="text-sm">•</span>
+            <p className="text-sm">SYNTHESIZER • PIANO • DRUM MACHINES</p>
+            <span className="text-sm">•</span>
+            <div className="flex items-center gap-1">
+              <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+              <span className="text-sm">REC</span>
+            </div>
+          </div>
         </div>
 
-        {/* Control Panel */}
-        <Card className="bg-zinc-900/95 border-zinc-700 backdrop-blur-sm">
-          <CardHeader className="pb-4">
-            <CardTitle className="text-white text-xl">web-midi-music v.1</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {/* Sound Mode Selection */}
-            <div className="flex flex-wrap items-center gap-3">
-              <span className="text-white text-sm font-medium">Keys Mode:</span>
-              <div className="flex gap-2">
-                <Button
-                  variant={soundMode === "piano" ? "default" : "secondary"}
-                  size="sm"
-                  onClick={() => {
-                    stopAllNotes()
-                    setSoundMode("piano")
-                  }}
-                  className={`${
-                    soundMode === "piano"
-                      ? "bg-zinc-700 hover:bg-zinc-600 text-white"
-                      : "bg-zinc-800 hover:bg-zinc-700 text-white"
-                  } font-medium`}
-                >
-                  Piano
-                </Button>
-                <Button
-                  variant={soundMode === "oscillator" ? "default" : "secondary"}
-                  size="sm"
-                  onClick={() => {
-                    stopAllNotes()
-                    setSoundMode("oscillator")
-                  }}
-                  className={`${
-                    soundMode === "oscillator"
-                      ? "bg-zinc-700 hover:bg-zinc-600 text-white"
-                      : "bg-zinc-800 hover:bg-zinc-700 text-white"
-                  } font-medium`}
-                >
-                  Synthesizer
-                </Button>
-              </div>
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={emergencyStop}
-                className="ml-auto bg-red-600 hover:bg-red-700 text-white font-medium"
-              >
-                Stop All
-              </Button>
-            </div>
+        {/* Main Control Deck - Split Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+          {/* Left Column - Synthesizer Controls */}
+          <div className="lg:col-span-1 space-y-5">
+            <Card className="bg-gradient-to-br from-zinc-900/95 to-black border-zinc-800 backdrop-blur-sm">
+              <CardHeader className="pb-4 border-b border-zinc-800">
+                <CardTitle className="text-white text-xl flex items-center gap-2">
+                  <div className="w-3 h-3 bg-cyan-500 rounded-full animate-pulse"></div>
+                  SYNTHESIZER
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6 pt-6">
+                {/* Sound Mode Selection */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-white text-sm font-medium">MODE SELECT</span>
+                    <div className="flex gap-1 bg-zinc-800 p-1 rounded-lg">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          stopAllNotes()
+                          setSoundMode("piano")
+                        }}
+                        className={`${
+                          soundMode === "piano"
+                            ? "bg-zinc-700 hover:bg-zinc-600 text-white shadow-inner"
+                            : "bg-transparent hover:bg-zinc-700/50 text-zinc-400"
+                        } font-medium text-xs px-3`}
+                      >
+                        PIANO
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          stopAllNotes()
+                          setSoundMode("oscillator")
+                        }}
+                        className={`${
+                          soundMode === "oscillator"
+                            ? "bg-zinc-700 hover:bg-zinc-600 text-white shadow-inner"
+                            : "bg-transparent hover:bg-zinc-700/50 text-zinc-400"
+                        } font-medium text-xs px-3`}
+                      >
+                        SYNTH
+                      </Button>
+                    </div>
+                  </div>
+                  
+                  {/* Waveform Selection */}
+                  {soundMode === "oscillator" && (
+                    <div className="bg-zinc-800/50 p-4 rounded-lg border border-zinc-700/50">
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-white text-sm font-medium">WAVEFORM</span>
+                        <span className="text-cyan-300 text-xs font-mono">{waveform.toUpperCase()}</span>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        {(["sine", "square", "sawtooth", "triangle"] as OscillatorType[]).map((wave) => (
+                          <Button
+                            key={wave}
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setWaveform(wave)}
+                            className={`${
+                              waveform === wave
+                                ? "bg-cyan-500/20 border-cyan-500 text-cyan-300"
+                                : "bg-zinc-800/30 border-zinc-700 text-zinc-400 hover:bg-zinc-700/50"
+                            } capitalize font-medium text-xs h-8`}
+                          >
+                            {wave}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
 
-            {/* Control Knobs */}
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
-              <ControlKnob
-                label="Volume"
-                value={audioSettings.volume}
-                min={0}
-                max={1}
-                onChange={(value) => updateAudioSetting("volume", value)}
-              />
-              <ControlKnob
-                label="Attack"
-                value={audioSettings.attack}
-                min={0.01}
-                max={1}
-                onChange={(value) => updateAudioSetting("attack", value)}
-                unit="s"
-              />
-              <ControlKnob
-                label="Release"
-                value={audioSettings.release}
-                min={0.01}
-                max={3}
-                onChange={(value) => updateAudioSetting("release", value)}
-                unit="s"
-              />
-              <ControlKnob
-                label="Filter"
-                value={audioSettings.filterFreq}
-                min={100}
-                max={8000}
-                onChange={(value) => updateAudioSetting("filterFreq", value)}
-                unit="Hz"
-              />
-              <ControlKnob
-                label="Reverb"
-                value={audioSettings.reverb}
-                min={0}
-                max={1}
-                onChange={(value) => updateAudioSetting("reverb", value)}
-              />
-            </div>
+                {/* Control Knobs - Vertical Layout */}
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <ControlKnob
+                      label="VOLUME"
+                      value={audioSettings.volume}
+                      min={0}
+                      max={1}
+                      onChange={(value) => updateAudioSetting("volume", value)}
+                    />
+                    <ControlKnob
+                      label="FILTER"
+                      value={audioSettings.filterFreq}
+                      min={100}
+                      max={8000}
+                      onChange={(value) => updateAudioSetting("filterFreq", value)}
+                      unit="Hz"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <ControlKnob
+                      label="ATTACK"
+                      value={audioSettings.attack}
+                      min={0.01}
+                      max={1}
+                      onChange={(value) => updateAudioSetting("attack", value)}
+                      unit="s"
+                    />
+                    <ControlKnob
+                      label="RELEASE"
+                      value={audioSettings.release}
+                      min={0.01}
+                      max={3}
+                      onChange={(value) => updateAudioSetting("release", value)}
+                      unit="s"
+                    />
+                  </div>
+                  <ControlKnob
+                    label="REVERB"
+                    value={audioSettings.reverb}
+                    min={0}
+                    max={1}
+                    onChange={(value) => updateAudioSetting("reverb", value)}
+                  />
+                </div>
 
-            {/* Waveform Selection - Only show for oscillator mode */}
-            {soundMode === "oscillator" && (
-              <div className="flex flex-wrap items-center gap-3">
-                <span className="text-white text-sm font-medium">Waveform:</span>
-                <div className="flex gap-2">
-                  {(["sine", "square", "sawtooth", "triangle"] as OscillatorType[]).map((wave) => (
+                {/* Control Buttons */}
+                <div className="space-y-3">
+                  {!isPlaying ? (
                     <Button
-                      key={wave}
-                      variant="secondary"
-                      size="sm"
-                      onClick={() => setWaveform(wave)}
-                      className={`${
-                        waveform === wave
-                          ? "bg-zinc-600 hover:bg-zinc-500 text-white"
-                          : "bg-zinc-800 hover:bg-zinc-700 text-white"
-                      } capitalize font-medium`}
+                      onClick={startAudio}
+                      className="w-full bg-gradient-to-r from-indigo-500 to-cyan-500 hover:from-indigo-600 hover:to-cyan-600 text-white font-bold py-4 text-base shadow-lg shadow-indigo-500/25"
+                      size="lg"
                     >
-                      {wave}
+                      <div className="flex items-center justify-center gap-2">
+                        <div className="w-3 h-3 bg-white rounded-full animate-pulse"></div>
+                        <span>POWER ON</span>
+                        <div className="w-3 h-3 bg-white rounded-full animate-pulse"></div>
+                      </div>
                     </Button>
-                  ))}
+                  ) : (
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="text-center p-3 bg-green-900/20 border border-green-800 rounded-lg">
+                        <div className="text-green-400 text-xs mb-1">STATUS</div>
+                        <div className="text-white text-sm font-bold">ACTIVE</div>
+                      </div>
+                      <Button
+                        variant="destructive"
+                        onClick={emergencyStop}
+                        className="bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white font-bold py-4 h-auto"
+                      >
+                        STOP ALL
+                      </Button>
+                    </div>
+                  )}
                 </div>
-              </div>
-            )}
 
-            {/* Piano Mode Info */}
-            {soundMode === "piano" && (
-              <div className="bg-zinc-800/60 p-4 rounded-lg border border-zinc-700">
-                <p className="text-zinc-200 text-sm leading-relaxed">
-                  <strong>Piano mode</strong> multi-harmonic synthesis with attack and decay
-                  characteristics.
-                </p>
-              </div>
-            )}
-
-            {/* Initialize Audio Button */}
-            {!isPlaying && (
-              <Button
-                onClick={startAudio}
-                className="w-full bg-indigo-400 hover:bg-cyan-400 text-white font-medium py-3 text-base"
-                size="lg"
-              >
-              ♫♪ START |̲̅̅●̲̅̅|̲̅̅=̲̅̅|̲̅̅●̲̅̅| AUDIO ♫♪
-              </Button>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Loop Recorder */}
-        <LoopRecorder audioContext={audioContext} masterGain={masterGainRef.current} />
-
-        {/* Drum Machine */}
-        <DrumMachine audioContext={audioContext} masterGain={masterGainRef.current} />
-
-        {/* Piano */}
-        <Card className="bg-zinc-900/95 border-zinc-700 backdrop-blur-sm">
-          <CardHeader className="pb-4">
-            <CardTitle className="text-white text-xl text-center">Piano Keyboard</CardTitle>
-          </CardHeader>
-          <CardContent className="flex justify-center py-6">
-            <Piano onNotePlay={playNote} onNoteStop={stopNote} />
-          </CardContent>
-        </Card>
-
-        {/* Instructions */}
-        <Card className="bg-zinc-900/95 border-zinc-700 backdrop-blur-sm">
-          <CardContent className="pt-6 space-y-4">
-            <p className="text-zinc-200 text-center text-base">
-              play notes by clicking the piano keys or using your computer keyboard. NO sound? click{" "}
-              <strong>"initialize Audio"</strong> due to browser restrictions.
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-              <div className="bg-zinc-800/60 p-4 rounded-lg border border-zinc-700">
-                <h4 className="text-white font-semibold mb-3">Keyboard Controls - Lower Octave (C4-B4):</h4>
-                <div className="text-zinc-200 space-y-2">
-                  <div className="flex items-center gap-2">
-                    <span className="text-zinc-300">White keys:</span>
-                    <span className="font-mono text-zinc-100 bg-zinc-900 px-2 py-1 rounded text-xs">A S D F G H J</span>
+                {/* Mode Info */}
+                {soundMode === "piano" && (
+                  <div className="bg-gradient-to-r from-blue-900/20 to-cyan-900/20 p-4 rounded-lg border border-blue-800/30">
+                    <p className="text-blue-200 text-xs leading-relaxed">
+                      <strong>PIANO MODE</strong> • Multi-harmonic synthesis with realistic attack and decay characteristics. Perfect for melodic playing.
+                    </p>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-zinc-300">Black keys:</span>
-                    <span className="font-mono text-zinc-100 bg-zinc-900 px-2 py-1 rounded text-xs">W E T Y U</span>
-                  </div>
-                </div>
-              </div>
-              <div className="bg-zinc-800/60 p-4 rounded-lg border border-zinc-700">
-                <h4 className="text-white font-semibold mb-3">Keyboard Controls - Higher Octave (C5-B5):</h4>
-                <div className="text-zinc-200 space-y-2">
-                  <div className="flex items-center gap-2">
-                    <span className="text-zinc-300">White keys:</span>
-                    <span className="font-mono text-zinc-100 bg-zinc-900 px-2 py-1 rounded text-xs">K L ; ' ↵ Z C</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-zinc-300">Black keys:</span>
-                    <span className="font-mono text-zinc-100 bg-zinc-900 px-2 py-1 rounded text-xs">O P ] \ X</span>
-                  </div>
-                </div>
-              </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Center Column - Main Instruments */}
+          <div className="lg:col-span-2 space-y-5">
+            {/* Drum Machine */}
+            <div className="relative">
+              <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500/10 to-cyan-500/10 blur-lg rounded-xl"></div>
+              <DrumMachine audioContext={audioContext} masterGain={masterGainRef.current} />
             </div>
-          </CardContent>
-        </Card>
+
+            {/* Piano */}
+            <div className="relative">
+              <div className="absolute -inset-1 bg-gradient-to-r from-purple-500/10 to-pink-500/10 blur-lg rounded-xl"></div>
+              <Card className="bg-gradient-to-br from-zinc-900/95 to-black border-zinc-800 backdrop-blur-sm">
+                <CardHeader className="pb-4 border-b border-zinc-800">
+                  <CardTitle className="text-white text-xl flex items-center gap-2">
+                    <div className="w-3 h-3 bg-purple-500 rounded-full animate-pulse"></div>
+                    PIANO KEYBOARD
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="flex justify-center py-6">
+                  <Piano onNotePlay={playNote} onNoteStop={stopNote} />
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Row - Loop Recorder and Instructions */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+          {/* Loop Recorder */}
+          <div className="lg:col-span-2">
+            <Card className="bg-gradient-to-br from-zinc-900/95 to-black border-zinc-800 backdrop-blur-sm">
+              <CardHeader className="pb-4 border-b border-zinc-800">
+                <CardTitle className="text-white text-xl flex items-center gap-2">
+                  <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+                  LOOP RECORDER
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-6">
+                <LoopRecorder audioContext={audioContext} masterGain={masterGainRef.current} />
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Instructions Panel */}
+          <div>
+            <Card className="bg-gradient-to-br from-zinc-900/95 to-black border-zinc-800 backdrop-blur-sm h-full">
+              <CardHeader className="pb-4 border-b border-zinc-800">
+                <CardTitle className="text-white text-xl flex items-center gap-2">
+                  <div className="w-3 h-3 bg-amber-500 rounded-full"></div>
+                  CONTROLS
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-6">
+                <div className="space-y-4">
+                  <div className="space-y-3">
+                    <h4 className="text-white font-semibold text-sm">KEYBOARD MAPPING</h4>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="bg-zinc-800/50 p-3 rounded-lg">
+                        <div className="text-cyan-300 text-xs font-semibold mb-1">OCTAVE 1</div>
+                        <div className="space-y-1">
+                          <div className="text-zinc-300 text-xs">White: <span className="font-mono text-white">A S D F G H J</span></div>
+                          <div className="text-zinc-300 text-xs">Black: <span className="font-mono text-white">W E T Y U</span></div>
+                        </div>
+                      </div>
+                      <div className="bg-zinc-800/50 p-3 rounded-lg">
+                        <div className="text-purple-300 text-xs font-semibold mb-1">OCTAVE 2</div>
+                        <div className="space-y-1">
+                          <div className="text-zinc-300 text-xs">White: <span className="font-mono text-white">K L ; ' ↵ Z C</span></div>
+                          <div className="text-zinc-300 text-xs">Black: <span className="font-mono text-white">O P ] \ X</span></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-gradient-to-r from-amber-900/20 to-yellow-900/20 p-3 rounded-lg border border-amber-800/30">
+                    <h4 className="text-amber-300 font-semibold text-sm mb-2">QUICK TIPS</h4>
+                    <ul className="text-zinc-300 text-xs space-y-1">
+                      <li className="flex items-start gap-2">
+                        <span className="text-amber-400">▶</span>
+                        <span>Click "POWER ON" to start audio</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-amber-400">▶</span>
+                        <span>Use Drum Machine repeater for patterns</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-amber-400">▶</span>
+                        <span>Switch between Piano/Synth modes</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-amber-400">▶</span>
+                        <span>Record loops with Loop Recorder</span>
+                      </li>
+                    </ul>
+                  </div>
+
+                  {/* Audio Status */}
+                  <div className="bg-zinc-800/30 p-3 rounded-lg">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-white text-xs font-medium">AUDIO STATUS</span>
+                      <div className={`px-2 py-1 rounded text-xs ${isPlaying ? 'bg-green-900/50 text-green-300' : 'bg-red-900/50 text-red-300'}`}>
+                        {isPlaying ? 'ACTIVE' : 'STANDBY'}
+                      </div>
+                    </div>
+                    <div className="w-full bg-zinc-800 h-1 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-gradient-to-r from-green-500 to-cyan-500 transition-all duration-300"
+                        style={{ width: isPlaying ? '100%' : '30%' }}
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
 
         {/* Footer */}
-        <div className="text-center py-6">
-          <p className="text-zinc-500 text-sm">
-           JRs web midi{" "}
-            <a
-              href="https://github.com/sudo-self/midi-controller"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-zinc-300 hover:text-white transition-colors duration-200 font-medium"
-            >
-            controller
-            </a>
-          </p>
+        <div className="text-center py-4 border-t border-zinc-800/50">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-3">
+            <p className="text-zinc-500 text-sm">
+              WEB MIDI MUSIC v1.0 • Built with Web Audio API
+            </p>
+            <div className="flex items-center gap-4">
+              <a
+                href="https://github.com/sudo-self/midi-controller"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-zinc-400 hover:text-white transition-colors duration-200 text-sm flex items-center gap-1"
+              >
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                </svg>
+                GitHub
+              </a>
+              <div className="text-zinc-600 text-sm">•</div>
+              <div className="text-zinc-400 text-sm">
+                <span className="text-cyan-400">♫♪</span> JRs Web MIDI Controller <span className="text-cyan-400">♫♪</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
