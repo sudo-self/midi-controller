@@ -466,19 +466,9 @@ const MidiController: React.FC = () => {
 
         {/* Bottom Row - Loop Recorder and Instructions */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-          {/* Loop Recorder */}
+          {/* Loop Recorder - Now with MP3 Player on right side */}
           <div className="lg:col-span-2">
-            <Card className="bg-gradient-to-br from-zinc-900/95 to-black border-zinc-800 backdrop-blur-sm">
-              <CardHeader className="pb-4 border-b border-zinc-800">
-                <CardTitle className="text-white text-xl flex items-center gap-2">
-                  <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-                  LOOP RECORDER
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="pt-6">
-                <LoopRecorder audioContext={audioContext} masterGain={masterGainRef.current} />
-              </CardContent>
-            </Card>
+            <LoopRecorder audioContext={audioContext} masterGain={masterGainRef.current} />
           </div>
 
           {/* Instructions Panel */}
@@ -513,7 +503,7 @@ const MidiController: React.FC = () => {
                   </div>
 
                   <div className="bg-gradient-to-r from-amber-900/20 to-yellow-900/20 p-3 rounded-lg border border-amber-800/30">
-                    <h4 className="text-amber-300 font-semibold text-sm mb-2"[♥]]] [♦]]] [♣]]] [♠]]]</h4>
+                    <h4 className="text-amber-300 font-semibold text-sm mb-2">QUICK TIPS</h4>
                     <ul className="text-zinc-300 text-xs space-y-1">
                       <li className="flex items-start gap-2">
                         <span className="text-amber-400">▶</span>
@@ -530,6 +520,10 @@ const MidiController: React.FC = () => {
                       <li className="flex items-start gap-2">
                         <span className="text-amber-400">▶</span>
                         <span>Record loops with Loop Recorder</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-amber-400">▶</span>
+                        <span>Play MP3 tracks for background music</span>
                       </li>
                     </ul>
                   </div>
