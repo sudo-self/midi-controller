@@ -744,10 +744,10 @@ const DrumMachine: React.FC<DrumMachineProps> = ({ audioContext, masterGain }) =
             </div>
             
             <div className="bg-zinc-800/60 p-4 rounded-lg border border-zinc-700">
-              <h3 className="text-white font-medium mb-2">Instructions</h3>
+              <h3 className="text-white font-medium mb-2">Midi Beats</h3>
               <p className="text-zinc-300 text-sm">
                 click pads or use keys <span className="font-mono text-white">1-6</span> to play sounds.
-                Toggle between <span className="font-semibold text-blue-300">Classic Kit</span>
+                Toggle between <span className="font-semibold text-blue-300">Classic Kit </span>
                 and <span className="font-semibold text-indigo-300">DJ Kit</span>
               </p>
             </div>
@@ -795,7 +795,7 @@ const DrumMachine: React.FC<DrumMachineProps> = ({ audioContext, masterGain }) =
                 <div className="flex-1">
                   <h3 className="text-white font-medium mb-2">Repeater</h3>
                   <p className="text-zinc-300 text-sm">
-                    Play a sound, then activate repeater to create automatic patterns.
+                    create automatic patterns, play a sound and set repeater.
                     Last played: <span className="font-mono text-white">
                       {lastPlayedSound ? lastPlayedSound.toUpperCase() : "None"}
                     </span>
@@ -863,7 +863,7 @@ const DrumMachine: React.FC<DrumMachineProps> = ({ audioContext, masterGain }) =
                       : "bg-zinc-700 text-zinc-300 hover:bg-zinc-600"
                   }`}
                 >
-                  Slow (400ms)
+                  Slow
                 </button>
                 <button
                   onClick={() => updateRepeatSpeed(200)}
@@ -873,7 +873,7 @@ const DrumMachine: React.FC<DrumMachineProps> = ({ audioContext, masterGain }) =
                       : "bg-zinc-700 text-zinc-300 hover:bg-zinc-600"
                   }`}
                 >
-                  Medium (200ms)
+                  Medium
                 </button>
                 <button
                   onClick={() => updateRepeatSpeed(100)}
@@ -883,7 +883,7 @@ const DrumMachine: React.FC<DrumMachineProps> = ({ audioContext, masterGain }) =
                       : "bg-zinc-700 text-zinc-300 hover:bg-zinc-600"
                   }`}
                 >
-                  Fast (100ms)
+                  Fast 
                 </button>
                 <button
                   onClick={() => updateRepeatSpeed(50)}
@@ -893,7 +893,7 @@ const DrumMachine: React.FC<DrumMachineProps> = ({ audioContext, masterGain }) =
                       : "bg-zinc-700 text-zinc-300 hover:bg-zinc-600"
                   }`}
                 >
-                  Rapid (50ms)
+                  Rapid 
                 </button>
               </div>
             </div>
