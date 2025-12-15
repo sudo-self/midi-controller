@@ -589,7 +589,7 @@ const DrumMachine: React.FC<DrumMachineProps> = ({ audioContext, masterGain }) =
       <div className="text-white font-medium text-lg">Drum Kits</div>
       <div className="flex items-center space-x-2">
         <span className={`text-sm ${activeKit === "kit1" ? "text-blue-300 font-semibold" : "text-zinc-300"}`}>
-          KIT 1
+          Classic Kit
         </span>
         <button
           onClick={() => setActiveKit(activeKit === "kit1" ? "kit2" : "kit1")}
@@ -603,7 +603,7 @@ const DrumMachine: React.FC<DrumMachineProps> = ({ audioContext, masterGain }) =
           />
         </button>
         <span className={`text-sm ${activeKit === "kit2" ? "text-indigo-300 font-semibold" : "text-zinc-300"}`}>
-          KIT 2
+          DJ Kit
         </span>
       </div>
     </div>
@@ -693,9 +693,9 @@ const DrumMachine: React.FC<DrumMachineProps> = ({ audioContext, masterGain }) =
             <div className="bg-zinc-800/60 p-4 rounded-lg border border-zinc-700">
               <h3 className="text-white font-medium mb-2">Instructions</h3>
               <p className="text-zinc-300 text-sm">
-                Click pads or use keys <span className="font-mono text-white">1-6</span> to play sounds.
-                Toggle between <span className="font-semibold text-blue-300">KIT 1</span> (classic drums) 
-                and <span className="font-semibold text-indigo-300">KIT 2</span> (electro sounds).
+                click pads or use keys <span className="font-mono text-white">1-6</span> to play sounds.
+                Toggle between <span className="font-semibold text-blue-300">Classic Kit</span>
+                and <span className="font-semibold text-indigo-300">DJ Kit</span>
               </p>
             </div>
           </div>
@@ -742,7 +742,7 @@ const DrumMachine: React.FC<DrumMachineProps> = ({ audioContext, masterGain }) =
           <p className="text-zinc-400 text-sm">
             Currently using <span className="font-semibold text-white">{activeKit === "kit1" ? "CLASSIC KIT" : "ELECTRO KIT"}</span> • 
             Use keys <span className="font-mono text-white">1-6</span> • 
-            Switch kits with the toggle above
+           Web Midi Music v.1
           </p>
         </div>
       </CardContent>
