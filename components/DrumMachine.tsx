@@ -4,19 +4,24 @@ import type React from "react"
 
 import { useState, useRef, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Switch } from "@/components/ui/switch"
+import { Label } from "@/components/ui/label"
 
 interface DrumMachineProps {
   audioContext: AudioContext | null
   masterGain: GainNode | null
 }
 
-type DrumSound = "kick" | "snare" | "cymbal" | "tom" | "snare2" | "siren"
+type DrumSound = "kick" | "snare" | "cymbal" | "tom" | "snare2" | "siren" | "kick2" | "hihat" | "clap" | "cowbell" | "rimshot" | "laser"
+
+type KitType = "kit1" | "kit2"
 
 const DrumMachine: React.FC<DrumMachineProps> = ({ audioContext, masterGain }) => {
   const [activePad, setActivePad] = useState<DrumSound | null>(null)
+  const [activeKit, setActiveKit] = useState<KitType>("kit1")
   const activeNodesRef = useRef<Map<DrumSound, AudioBufferSourceNode>>(new Map())
 
-  // Create drum sounds using the Web Audio API
+  // KIT 1 Sounds (Original)
   const createKick = (ctx: AudioContext, destination: AudioNode) => {
     const osc = ctx.createOscillator()
     const gain = ctx.createGain()
@@ -243,6 +248,210 @@ const DrumMachine: React.FC<DrumMachineProps> = ({ audioContext, masterGain }) =
     return { osc1, osc2, gain, lfo, lfoGain }
   }
 
+  // KIT 2 Sounds (New Different Sounds)
+  const createKick2 = (ctx: AudioContext, destination: AudioNode) => {
+    // More aggressive, punchy kick
+    const osc1 = ctx.createOscillator()
+    const osc2 = ctx.createOscillator()
+    const gain1 = ctx.createGain()
+    const gain2 = ctx.createGain()
+    const masterGain = ctx.createGain()
+
+    osc1.type = "sine"
+    osc1.frequency.setValueAtTime(80, ctx.currentTime)
+    osc1.frequency.exponentialRampToValueAtTime(40, ctx.currentTime + 0.1)
+    osc1.frequency.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3)
+
+    osc2.type = "triangle"
+    osc2.frequency.value = 60
+    osc2.frequency.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1)
+
+    gain1.gain.setValueAtTime(1, ctx.currentTime)
+    gain1.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3)
+
+    gain2.gain.setValueAtTime(0.5, ctx.currentTime)
+    gain2.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1)
+
+    masterGain.gain.setValueAtTime(1, ctx.currentTime)
+    masterGain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3)
+
+    osc1.connect(gain1)
+    osc2.connect(gain2)
+    gain1.connect(masterGain)
+    gain2.connect(masterGain)
+    masterGain.connect(destination)
+
+    osc1.start(ctx.currentTime)
+    osc2.start(ctx.currentTime)
+    osc1.stop(ctx.currentTime + 0.3)
+    osc2.stop(ctx.currentTime + 0.1)
+
+    return { osc1, osc2, gain1, gain2, masterGain }
+  }
+
+  const createHihat = (ctx: AudioContext, destination: AudioNode) => {
+    // Bright hi-hat sound
+    const noiseBuffer = ctx.createBuffer(1, ctx.sampleRate * 0.1, ctx.sampleRate)
+    const data = noiseBuffer.getChannelData(0)
+    for (let i = 0; i < data.length; i++) {
+      data[i] = Math.random() * 2 - 1
+    }
+
+    const noise = ctx.createBufferSource()
+    noise.buffer = noiseBuffer
+
+    const filter = ctx.createBiquadFilter()
+    filter.type = "bandpass"
+    filter.frequency.value = 8000
+    filter.Q.value = 2
+
+    const gain = ctx.createGain()
+    gain.gain.setValueAtTime(0.6, ctx.currentTime)
+    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1)
+
+    const compressor = ctx.createDynamicsCompressor()
+    compressor.threshold.value = -20
+    compressor.ratio.value = 8
+    compressor.attack.value = 0.001
+    compressor.release.value = 0.1
+
+    noise.connect(filter)
+    filter.connect(gain)
+    gain.connect(compressor)
+    compressor.connect(destination)
+
+    noise.start(ctx.currentTime)
+    noise.stop(ctx.currentTime + 0.1)
+
+    return { noise, filter, gain, compressor }
+  }
+
+  const createClap = (ctx: AudioContext, destination: AudioNode) => {
+    // Realistic clap sound with multiple noise bursts
+    const now = ctx.currentTime
+    
+    // Create multiple noise bursts for clap effect
+    for (let i = 0; i < 3; i++) {
+      const noiseBuffer = ctx.createBuffer(1, ctx.sampleRate * 0.05, ctx.sampleRate)
+      const data = noiseBuffer.getChannelData(0)
+      for (let j = 0; j < data.length; j++) {
+        data[j] = Math.random() * 2 - 1
+      }
+
+      const noise = ctx.createBufferSource()
+      noise.buffer = noiseBuffer
+
+      const filter = ctx.createBiquadFilter()
+      filter.type = "bandpass"
+      filter.frequency.value = 1200 + i * 200
+      filter.Q.value = 1
+
+      const gain = ctx.createGain()
+      gain.gain.setValueAtTime(0.3 - i * 0.08, now + i * 0.01)
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1 + i * 0.01)
+
+      noise.connect(filter)
+      filter.connect(gain)
+      gain.connect(destination)
+
+      noise.start(now + i * 0.01)
+      noise.stop(now + 0.05 + i * 0.01)
+    }
+
+    return {}
+  }
+
+  const createCowbell = (ctx: AudioContext, destination: AudioNode) => {
+    // Metallic cowbell sound
+    const osc1 = ctx.createOscillator()
+    const osc2 = ctx.createOscillator()
+    const gain = ctx.createGain()
+
+    osc1.type = "sine"
+    osc1.frequency.value = 900
+
+    osc2.type = "square"
+    osc2.frequency.value = 1200
+
+    gain.gain.setValueAtTime(0.7, ctx.currentTime)
+    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4)
+
+    osc1.connect(gain)
+    osc2.connect(gain)
+    gain.connect(destination)
+
+    const filter = ctx.createBiquadFilter()
+    filter.type = "bandpass"
+    filter.frequency.value = 1000
+    filter.Q.value = 5
+
+    gain.connect(filter)
+    filter.connect(destination)
+
+    osc1.start(ctx.currentTime)
+    osc2.start(ctx.currentTime)
+    osc1.stop(ctx.currentTime + 0.4)
+    osc2.stop(ctx.currentTime + 0.4)
+
+    return { osc1, osc2, gain, filter }
+  }
+
+  const createRimshot = (ctx: AudioContext, destination: AudioNode) => {
+    // Short, sharp rimshot sound
+    const osc1 = ctx.createOscillator()
+    const osc2 = ctx.createOscillator()
+    const gain = ctx.createGain()
+
+    osc1.type = "sine"
+    osc1.frequency.value = 500
+    osc1.frequency.exponentialRampToValueAtTime(200, ctx.currentTime + 0.05)
+
+    osc2.type = "triangle"
+    osc2.frequency.value = 800
+
+    gain.gain.setValueAtTime(0.8, ctx.currentTime)
+    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.08)
+
+    osc1.connect(gain)
+    osc2.connect(gain)
+    gain.connect(destination)
+
+    osc1.start(ctx.currentTime)
+    osc2.start(ctx.currentTime)
+    osc1.stop(ctx.currentTime + 0.08)
+    osc2.stop(ctx.currentTime + 0.08)
+
+    return { osc1, osc2, gain }
+  }
+
+  const createLaser = (ctx: AudioContext, destination: AudioNode) => {
+    // Laser beam sound with pitch sweep
+    const osc = ctx.createOscillator()
+    const gain = ctx.createGain()
+    const filter = ctx.createBiquadFilter()
+
+    osc.type = "sawtooth"
+    osc.frequency.setValueAtTime(800, ctx.currentTime)
+    osc.frequency.exponentialRampToValueAtTime(2000, ctx.currentTime + 0.2)
+
+    filter.type = "lowpass"
+    filter.frequency.value = 2000
+    filter.frequency.exponentialRampToValueAtTime(8000, ctx.currentTime + 0.1)
+    filter.frequency.exponentialRampToValueAtTime(100, ctx.currentTime + 0.3)
+
+    gain.gain.setValueAtTime(0.6, ctx.currentTime)
+    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3)
+
+    osc.connect(filter)
+    filter.connect(gain)
+    gain.connect(destination)
+
+    osc.start(ctx.currentTime)
+    osc.stop(ctx.currentTime + 0.3)
+
+    return { osc, gain, filter }
+  }
+
   const playDrum = (sound: DrumSound) => {
     if (!audioContext || !masterGain) return
 
@@ -251,6 +460,7 @@ const DrumMachine: React.FC<DrumMachineProps> = ({ audioContext, masterGain }) =
 
     try {
       switch (sound) {
+        // Kit 1 sounds
         case "kick":
           createKick(audioContext, masterGain)
           break
@@ -269,6 +479,25 @@ const DrumMachine: React.FC<DrumMachineProps> = ({ audioContext, masterGain }) =
         case "siren":
           createSiren(audioContext, masterGain)
           break
+        // Kit 2 sounds
+        case "kick2":
+          createKick2(audioContext, masterGain)
+          break
+        case "hihat":
+          createHihat(audioContext, masterGain)
+          break
+        case "clap":
+          createClap(audioContext, masterGain)
+          break
+        case "cowbell":
+          createCowbell(audioContext, masterGain)
+          break
+        case "rimshot":
+          createRimshot(audioContext, masterGain)
+          break
+        case "laser":
+          createLaser(audioContext, masterGain)
+          break
       }
     } catch (error) {
       console.error("Error playing drum sound:", error)
@@ -280,40 +509,82 @@ const DrumMachine: React.FC<DrumMachineProps> = ({ audioContext, masterGain }) =
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.repeat) return
 
-      switch (e.key.toLowerCase()) {
-        case "1":
-          playDrum("kick")
-          break
-        case "2":
-          playDrum("snare")
-          break
-        case "3":
-          playDrum("cymbal")
-          break
-        case "4":
-          playDrum("tom")
-          break
-        case "5":
-          playDrum("snare2")
-          break
-        case "6":
-          playDrum("siren")
-          break
+      let sound: DrumSound | null = null
+      
+      if (activeKit === "kit1") {
+        switch (e.key.toLowerCase()) {
+          case "1":
+            sound = "kick"
+            break
+          case "2":
+            sound = "snare"
+            break
+          case "3":
+            sound = "cymbal"
+            break
+          case "4":
+            sound = "tom"
+            break
+          case "5":
+            sound = "snare2"
+            break
+          case "6":
+            sound = "siren"
+            break
+        }
+      } else {
+        // Kit 2 key mappings
+        switch (e.key.toLowerCase()) {
+          case "1":
+            sound = "kick2"
+            break
+          case "2":
+            sound = "hihat"
+            break
+          case "3":
+            sound = "clap"
+            break
+          case "4":
+            sound = "cowbell"
+            break
+          case "5":
+            sound = "rimshot"
+            break
+          case "6":
+            sound = "laser"
+            break
+        }
+      }
+      
+      if (sound) {
+        playDrum(sound)
       }
     }
 
     window.addEventListener("keydown", handleKeyDown)
     return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [audioContext, masterGain])
+  }, [audioContext, masterGain, activeKit])
 
-  const pads: { sound: DrumSound; label: string; color: string; keyLabel: string }[] = [
-    { sound: "kick", label: "KICK", color: "from-zinc-700 to-zinc-800", keyLabel: "1" },
-    { sound: "snare", label: "SNARE", color: "from-zinc-600 to-zinc-700", keyLabel: "2" },
-    { sound: "cymbal", label: "CYMBAL", color: "from-zinc-700 to-zinc-800", keyLabel: "3" },
-    { sound: "tom", label: "TOM", color: "from-zinc-600 to-zinc-700", keyLabel: "4" },
-    { sound: "snare2", label: "SNARE2", color: "from-amber-600 to-amber-700", keyLabel: "5" },
-    { sound: "siren", label: "SIREN", color: "from-red-600 to-red-700", keyLabel: "6" },
+  // Define pads for each kit
+  const kit1Pads = [
+    { sound: "kick" as DrumSound, label: "KICK", color: "from-blue-700 to-blue-800", keyLabel: "1" },
+    { sound: "snare" as DrumSound, label: "SNARE", color: "from-green-600 to-green-700", keyLabel: "2" },
+    { sound: "cymbal" as DrumSound, label: "CYMBAL", color: "from-yellow-600 to-yellow-700", keyLabel: "3" },
+    { sound: "tom" as DrumSound, label: "TOM", color: "from-purple-600 to-purple-700", keyLabel: "4" },
+    { sound: "snare2" as DrumSound, label: "SNARE2", color: "from-amber-600 to-amber-700", keyLabel: "5" },
+    { sound: "siren" as DrumSound, label: "SIREN", color: "from-red-600 to-red-700", keyLabel: "6" },
   ]
+
+  const kit2Pads = [
+    { sound: "kick2" as DrumSound, label: "KICK2", color: "from-indigo-700 to-indigo-800", keyLabel: "1" },
+    { sound: "hihat" as DrumSound, label: "HI-HAT", color: "from-teal-600 to-teal-700", keyLabel: "2" },
+    { sound: "clap" as DrumSound, label: "CLAP", color: "from-pink-600 to-pink-700", keyLabel: "3" },
+    { sound: "cowbell" as DrumSound, label: "COWBELL", color: "from-orange-600 to-orange-700", keyLabel: "4" },
+    { sound: "rimshot" as DrumSound, label: "RIMSHOT", color: "from-cyan-600 to-cyan-700", keyLabel: "5" },
+    { sound: "laser" as DrumSound, label: "LASER", color: "from-violet-600 to-violet-700", keyLabel: "6" },
+  ]
+
+  const currentPads = activeKit === "kit1" ? kit1Pads : kit2Pads
 
   return (
     <Card className="bg-zinc-900/95 border-zinc-700 backdrop-blur-sm">
@@ -321,39 +592,148 @@ const DrumMachine: React.FC<DrumMachineProps> = ({ audioContext, masterGain }) =
         <CardTitle className="text-white text-xl text-center">Drum Machine</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 max-w-2xl mx-auto">
-          {pads.map((pad) => (
-            <button
-              key={pad.sound}
-              onClick={() => playDrum(pad.sound)}
-              className={`
-                relative h-32 rounded-xl bg-gradient-to-br ${pad.color}
-                border-2 transition-all duration-150
-                ${
-                  activePad === pad.sound
-                    ? "border-white shadow-lg shadow-white/50 scale-95"
-                    : "border-zinc-600 hover:border-zinc-500 shadow-md"
-                }
-                active:scale-95
-                group
-              `}
-            >
-              <div className="absolute inset-0 bg-white/5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity" />
-              <div className="relative flex flex-col items-center justify-center h-full">
-                <span className="text-white font-bold text-2xl tracking-wider mb-2">{pad.label}</span>
-                <span className="text-zinc-400 text-sm font-mono bg-zinc-800/50 px-2 py-1 rounded">
-                  Key: {pad.keyLabel}
-                </span>
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* Left side - Kit selector */}
+          <div className="lg:w-1/3 space-y-6">
+            <div className="bg-zinc-800/60 p-4 rounded-lg border border-zinc-700">
+              <div className="flex flex-col space-y-4">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="kit-switch" className="text-white font-medium text-lg">
+                    Drum Kits
+                  </Label>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-zinc-300 text-sm">KIT 1</span>
+                    <Switch
+                      id="kit-switch"
+                      checked={activeKit === "kit2"}
+                      onCheckedChange={(checked) => setActiveKit(checked ? "kit2" : "kit1")}
+                      className="data-[state=checked]:bg-blue-500"
+                    />
+                    <span className="text-zinc-300 text-sm">KIT 2</span>
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <div className="text-center">
+                    <span className="text-2xl font-bold text-white">
+                      {activeKit === "kit1" ? "CLASSIC KIT" : "ELECTRO KIT"}
+                    </span>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-2 mt-4">
+                    {activeKit === "kit1" ? (
+                      <>
+                        <div className="bg-blue-900/30 p-3 rounded-lg">
+                          <div className="text-blue-300 text-sm font-semibold">KICK</div>
+                          <div className="text-zinc-400 text-xs">Deep bass drum</div>
+                        </div>
+                        <div className="bg-green-900/30 p-3 rounded-lg">
+                          <div className="text-green-300 text-sm font-semibold">SNARE</div>
+                          <div className="text-zinc-400 text-xs">Acoustic snare</div>
+                        </div>
+                        <div className="bg-yellow-900/30 p-3 rounded-lg">
+                          <div className="text-yellow-300 text-sm font-semibold">CYMBAL</div>
+                          <div className="text-zinc-400 text-xs">Crash cymbal</div>
+                        </div>
+                        <div className="bg-purple-900/30 p-3 rounded-lg">
+                          <div className="text-purple-300 text-sm font-semibold">TOM</div>
+                          <div className="text-zinc-400 text-xs">Floor tom</div>
+                        </div>
+                        <div className="bg-amber-900/30 p-3 rounded-lg">
+                          <div className="text-amber-300 text-sm font-semibold">SNARE2</div>
+                          <div className="text-zinc-400 text-xs">Punchy snare</div>
+                        </div>
+                        <div className="bg-red-900/30 p-3 rounded-lg">
+                          <div className="text-red-300 text-sm font-semibold">SIREN</div>
+                          <div className="text-zinc-400 text-xs">Police siren</div>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="bg-indigo-900/30 p-3 rounded-lg">
+                          <div className="text-indigo-300 text-sm font-semibold">KICK2</div>
+                          <div className="text-zinc-400 text-xs">Punchy electro kick</div>
+                        </div>
+                        <div className="bg-teal-900/30 p-3 rounded-lg">
+                          <div className="text-teal-300 text-sm font-semibold">HI-HAT</div>
+                          <div className="text-zinc-400 text-xs">Bright closed hat</div>
+                        </div>
+                        <div className="bg-pink-900/30 p-3 rounded-lg">
+                          <div className="text-pink-300 text-sm font-semibold">CLAP</div>
+                          <div className="text-zinc-400 text-xs">Multi-clap effect</div>
+                        </div>
+                        <div className="bg-orange-900/30 p-3 rounded-lg">
+                          <div className="text-orange-300 text-sm font-semibold">COWBELL</div>
+                          <div className="text-zinc-400 text-xs">Metallic percussion</div>
+                        </div>
+                        <div className="bg-cyan-900/30 p-3 rounded-lg">
+                          <div className="text-cyan-300 text-sm font-semibold">RIMSHOT</div>
+                          <div className="text-zinc-400 text-xs">Sharp rim click</div>
+                        </div>
+                        <div className="bg-violet-900/30 p-3 rounded-lg">
+                          <div className="text-violet-300 text-sm font-semibold">LASER</div>
+                          <div className="text-zinc-400 text-xs">Sci-fi laser beam</div>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
               </div>
-              {activePad === pad.sound && (
-                <div className="absolute inset-0 rounded-xl bg-white/20 animate-pulse pointer-events-none" />
-              )}
-            </button>
-          ))}
+            </div>
+            
+            <div className="bg-zinc-800/60 p-4 rounded-lg border border-zinc-700">
+              <h3 className="text-white font-medium mb-2">Instructions</h3>
+              <p className="text-zinc-300 text-sm">
+                Click pads or use keys <span className="font-mono text-white">1-6</span> to play sounds.
+                Toggle between <span className="font-semibold text-blue-300">KIT 1</span> (classic drums) 
+                and <span className="font-semibold text-indigo-300">KIT 2</span> (electro sounds).
+              </p>
+            </div>
+          </div>
+          
+          {/* Right side - Drum pads */}
+          <div className="lg:w-2/3">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              {currentPads.map((pad) => (
+                <button
+                  key={pad.sound}
+                  onClick={() => playDrum(pad.sound)}
+                  className={`
+                    relative h-32 rounded-xl bg-gradient-to-br ${pad.color}
+                    border-2 transition-all duration-150
+                    ${
+                      activePad === pad.sound
+                        ? "border-white shadow-lg shadow-white/50 scale-95"
+                        : "border-zinc-600 hover:border-zinc-500 shadow-md"
+                    }
+                    active:scale-95
+                    group
+                  `}
+                >
+                  <div className="absolute inset-0 bg-white/5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="relative flex flex-col items-center justify-center h-full">
+                    <span className="text-white font-bold text-xl tracking-wider mb-2">{pad.label}</span>
+                    <span className="text-zinc-300 text-sm font-mono bg-black/30 px-2 py-1 rounded">
+                      Key: {pad.keyLabel}
+                    </span>
+                    <span className="text-zinc-400 text-xs mt-1 bg-black/20 px-2 py-0.5 rounded">
+                      {activeKit === "kit1" ? "Kit 1" : "Kit 2"}
+                    </span>
+                  </div>
+                  {activePad === pad.sound && (
+                    <div className="absolute inset-0 rounded-xl bg-white/20 animate-pulse pointer-events-none" />
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
-        <div className="text-center">
+        
+        <div className="text-center pt-4 border-t border-zinc-700">
           <p className="text-zinc-400 text-sm">
-            Click pads or press keys <span className="font-mono text-white">1-6</span> to play drums
+            Drum Machine <span className="font-semibold text-white">{activeKit === "kit1" ? "CLASSIC KIT" : "ELECTRO KIT"}</span> • 
+            Use keys <span className="font-mono text-white">1-6</span> • 
+            Switch kits
           </p>
         </div>
       </CardContent>
