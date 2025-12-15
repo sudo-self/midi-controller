@@ -513,7 +513,7 @@ const MidiController: React.FC = () => {
                   </div>
 
                   <div className="bg-gradient-to-r from-amber-900/20 to-yellow-900/20 p-3 rounded-lg border border-amber-800/30">
-                    <h4 className="text-amber-300 font-semibold text-sm mb-2">QUICK TIPS</h4>
+                    <h4 className="text-amber-300 font-semibold text-sm mb-2"[♥]]] [♦]]] [♣]]] [♠]]]</h4>
                     <ul className="text-zinc-300 text-xs space-y-1">
                       <li className="flex items-start gap-2">
                         <span className="text-amber-400">▶</span>
