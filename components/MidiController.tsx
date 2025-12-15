@@ -386,7 +386,7 @@ const MidiController: React.FC = () => {
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 text-base"
                 size="lg"
               >
-                🎵 Initialize Audio
+                🎵 initialize Audio
               </Button>
             )}
           </CardContent>
@@ -447,14 +447,14 @@ const MidiController: React.FC = () => {
         {/* Footer */}
         <div className="text-center py-6">
           <p className="text-slate-400 text-sm">
-            Made with ❤️ by{" "}
+            web midi controller by{" "}
             <a
-              href="https://rudypagnel.com/"
+              href="https://github.com/sudo-self/midi-controller"
               target="_blank"
               rel="noopener noreferrer"
               className="text-blue-400 hover:text-blue-300 transition-colors duration-200 font-medium"
             >
-              Rudy P. Agnel
+              sudo-self
             </a>
           </p>
         </div>
