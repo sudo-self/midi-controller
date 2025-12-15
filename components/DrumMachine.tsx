@@ -812,7 +812,7 @@ const DrumMachine: React.FC<DrumMachineProps> = ({ audioContext, masterGain }) =
                         className="px-2 py-1 bg-zinc-700 rounded text-white hover:bg-zinc-600 text-sm"
                         disabled={repeatSpeed <= 50}
                       >
-                        −
+                        +
                       </button>
                       <span className="text-white font-mono text-sm min-w-[60px] text-center">
                         {repeatSpeed}ms
@@ -822,7 +822,7 @@ const DrumMachine: React.FC<DrumMachineProps> = ({ audioContext, masterGain }) =
                         className="px-2 py-1 bg-zinc-700 rounded text-white hover:bg-zinc-600 text-sm"
                         disabled={repeatSpeed >= 1000}
                       >
-                        +
+                        - 
                       </button>
                     </div>
                   </div>
@@ -835,8 +835,8 @@ const DrumMachine: React.FC<DrumMachineProps> = ({ audioContext, masterGain }) =
                       isRepeating
                         ? "bg-red-600 hover:bg-red-700 text-white animate-pulse"
                         : lastPlayedSound
-                        ? "bg-green-600 hover:bg-green-700 text-white"
-                        : "bg-zinc-700 text-zinc-400 cursor-not-allowed"
+                        ? "bg-indigo-600 hover:bg-green-700 text-white"
+                        : "bg-orange-700 text-zinc-400 cursor-not-allowed"
                     }`}
                   >
                     {isRepeating ? (
