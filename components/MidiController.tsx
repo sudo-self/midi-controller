@@ -7,6 +7,7 @@ import ControlKnob from "./ControlKnob"
 import { PianoSynthesizer } from "./PianoSynthesizer"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import DrumMachine from "./DrumMachine"
 
 interface AudioSettings {
   volume: number
@@ -244,15 +245,15 @@ const MidiController: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-4 md:p-6">
+    <div className="min-h-screen bg-gradient-to-br from-black via-zinc-900 to-black p-4 md:p-6">
       <div className="max-w-6xl mx-auto space-y-6">
         <div className="text-center">
           <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">MIDI Controller</h1>
-          <p className="text-slate-300">Web-based synthesizer with realistic piano sounds</p>
+          <p className="text-zinc-300">Web-based synthesizer with realistic piano sounds</p>
         </div>
 
         {/* Control Panel */}
-        <Card className="bg-slate-800/90 border-slate-600 backdrop-blur-sm">
+        <Card className="bg-zinc-900/95 border-zinc-700 backdrop-blur-sm">
           <CardHeader className="pb-4">
             <CardTitle className="text-white text-xl">Sound Controls</CardTitle>
           </CardHeader>
@@ -270,8 +271,8 @@ const MidiController: React.FC = () => {
                   }}
                   className={`${
                     soundMode === "piano"
-                      ? "bg-blue-600 hover:bg-blue-700 text-white"
-                      : "bg-slate-600 hover:bg-slate-500 text-white"
+                      ? "bg-zinc-700 hover:bg-zinc-600 text-white"
+                      : "bg-zinc-800 hover:bg-zinc-700 text-white"
                   } font-medium`}
                 >
                   Piano
@@ -285,8 +286,8 @@ const MidiController: React.FC = () => {
                   }}
                   className={`${
                     soundMode === "oscillator"
-                      ? "bg-blue-600 hover:bg-blue-700 text-white"
-                      : "bg-slate-600 hover:bg-slate-500 text-white"
+                      ? "bg-zinc-700 hover:bg-zinc-600 text-white"
+                      : "bg-zinc-800 hover:bg-zinc-700 text-white"
                   } font-medium`}
                 >
                   Synthesizer
@@ -357,8 +358,8 @@ const MidiController: React.FC = () => {
                       onClick={() => setWaveform(wave)}
                       className={`${
                         waveform === wave
-                          ? "bg-green-600 hover:bg-green-700 text-white"
-                          : "bg-slate-600 hover:bg-slate-500 text-white"
+                          ? "bg-zinc-600 hover:bg-zinc-500 text-white"
+                          : "bg-zinc-800 hover:bg-zinc-700 text-white"
                       } capitalize font-medium`}
                     >
                       {wave}
@@ -370,8 +371,8 @@ const MidiController: React.FC = () => {
 
             {/* Piano Mode Info */}
             {soundMode === "piano" && (
-              <div className="bg-slate-700/50 p-4 rounded-lg border border-slate-600">
-                <p className="text-slate-200 text-sm leading-relaxed">
+              <div className="bg-zinc-800/60 p-4 rounded-lg border border-zinc-700">
+                <p className="text-zinc-200 text-sm leading-relaxed">
                   <strong>Piano mode</strong> uses multi-harmonic synthesis with realistic attack and decay
                   characteristics. The Release control adjusts how long notes sustain after being released (max 3
                   seconds). Use <strong>"Stop All"</strong> if you experience any audio issues.
@@ -383,7 +384,7 @@ const MidiController: React.FC = () => {
             {!isPlaying && (
               <Button
                 onClick={startAudio}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 text-base"
+                className="w-full bg-zinc-700 hover:bg-zinc-600 text-white font-medium py-3 text-base"
                 size="lg"
               >
                 🎵 initialize Audio
@@ -392,8 +393,11 @@ const MidiController: React.FC = () => {
           </CardContent>
         </Card>
 
+        {/* Drum Machine */}
+        <DrumMachine audioContext={audioContext} masterGain={masterGainRef.current} />
+
         {/* Piano */}
-        <Card className="bg-slate-800/90 border-slate-600 backdrop-blur-sm">
+        <Card className="bg-zinc-900/95 border-zinc-700 backdrop-blur-sm">
           <CardHeader className="pb-4">
             <CardTitle className="text-white text-xl text-center">Piano Keyboard</CardTitle>
           </CardHeader>
@@ -403,40 +407,36 @@ const MidiController: React.FC = () => {
         </Card>
 
         {/* Instructions */}
-        <Card className="bg-slate-800/90 border-slate-600 backdrop-blur-sm">
+        <Card className="bg-zinc-900/95 border-zinc-700 backdrop-blur-sm">
           <CardContent className="pt-6 space-y-4">
-            <p className="text-slate-200 text-center text-base">
+            <p className="text-zinc-200 text-center text-base">
               Play notes by clicking the piano keys or using your computer keyboard. You may need to click{" "}
               <strong>"Initialize Audio"</strong> first due to browser audio policies.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-              <div className="bg-slate-700/50 p-4 rounded-lg border border-slate-600">
+              <div className="bg-zinc-800/60 p-4 rounded-lg border border-zinc-700">
                 <h4 className="text-white font-semibold mb-3">Keyboard Controls - Lower Octave (C4-B4):</h4>
-                <div className="text-slate-200 space-y-2">
+                <div className="text-zinc-200 space-y-2">
                   <div className="flex items-center gap-2">
-                    <span className="text-slate-300">White keys:</span>
-                    <span className="font-mono text-blue-300 bg-slate-800 px-2 py-1 rounded text-xs">
-                      A S D F G H J
-                    </span>
+                    <span className="text-zinc-300">White keys:</span>
+                    <span className="font-mono text-zinc-100 bg-zinc-900 px-2 py-1 rounded text-xs">A S D F G H J</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-slate-300">Black keys:</span>
-                    <span className="font-mono text-yellow-300 bg-slate-800 px-2 py-1 rounded text-xs">W E T Y U</span>
+                    <span className="text-zinc-300">Black keys:</span>
+                    <span className="font-mono text-zinc-100 bg-zinc-900 px-2 py-1 rounded text-xs">W E T Y U</span>
                   </div>
                 </div>
               </div>
-              <div className="bg-slate-700/50 p-4 rounded-lg border border-slate-600">
+              <div className="bg-zinc-800/60 p-4 rounded-lg border border-zinc-700">
                 <h4 className="text-white font-semibold mb-3">Keyboard Controls - Higher Octave (C5-B5):</h4>
-                <div className="text-slate-200 space-y-2">
+                <div className="text-zinc-200 space-y-2">
                   <div className="flex items-center gap-2">
-                    <span className="text-slate-300">White keys:</span>
-                    <span className="font-mono text-blue-300 bg-slate-800 px-2 py-1 rounded text-xs">
-                      K L ; ' ↵ Z C
-                    </span>
+                    <span className="text-zinc-300">White keys:</span>
+                    <span className="font-mono text-zinc-100 bg-zinc-900 px-2 py-1 rounded text-xs">K L ; ' ↵ Z C</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-slate-300">Black keys:</span>
-                    <span className="font-mono text-yellow-300 bg-slate-800 px-2 py-1 rounded text-xs">O P ] \ X</span>
+                    <span className="text-zinc-300">Black keys:</span>
+                    <span className="font-mono text-zinc-100 bg-zinc-900 px-2 py-1 rounded text-xs">O P ] \ X</span>
                   </div>
                 </div>
               </div>
@@ -446,13 +446,13 @@ const MidiController: React.FC = () => {
 
         {/* Footer */}
         <div className="text-center py-6">
-          <p className="text-slate-400 text-sm">
+          <p className="text-zinc-500 text-sm">
             web midi controller by{" "}
             <a
               href="https://github.com/sudo-self/midi-controller"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-400 hover:text-blue-300 transition-colors duration-200 font-medium"
+              className="text-zinc-300 hover:text-white transition-colors duration-200 font-medium"
             >
               sudo-self
             </a>
