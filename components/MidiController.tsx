@@ -10,7 +10,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import LoopRecorder from "./LoopRecorder"
 import DrumMachine from "./DrumMachine"
 
-// The rest of the MidiController.tsx remains the same
 
 interface AudioSettings {
   volume: number
@@ -252,18 +251,18 @@ const MidiController: React.FC = () => {
       <div className="max-w-6xl mx-auto space-y-6">
         <div className="text-center">
           <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">WEB MIDI MUSIC</h1>
-          <p className="text-zinc-300">synthesizer. piano. drumb machine.</p>
+          <p className="text-zinc-300">synthesizer. piano. drum machines.</p>
         </div>
 
         {/* Control Panel */}
         <Card className="bg-zinc-900/95 border-zinc-700 backdrop-blur-sm">
           <CardHeader className="pb-4">
-            <CardTitle className="text-white text-xl">JRs Midi v1.0</CardTitle>
+            <CardTitle className="text-white text-xl">web-midi-music v.1</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             {/* Sound Mode Selection */}
             <div className="flex flex-wrap items-center gap-3">
-              <span className="text-white text-sm font-medium">Music Mode:</span>
+              <span className="text-white text-sm font-medium">Keys Mode:</span>
               <div className="flex gap-2">
                 <Button
                   variant={soundMode === "piano" ? "default" : "secondary"}
@@ -376,9 +375,8 @@ const MidiController: React.FC = () => {
             {soundMode === "piano" && (
               <div className="bg-zinc-800/60 p-4 rounded-lg border border-zinc-700">
                 <p className="text-zinc-200 text-sm leading-relaxed">
-                  <strong>Piano mode</strong> uses multi-harmonic synthesis with realistic attack and decay
-                  characteristics. The Release control adjusts how long notes sustain after being released (max 3
-                  seconds). Use <strong>"Stop All"</strong> if you experience any audio issues.
+                  <strong>Piano mode</strong> multi-harmonic synthesis with attack and decay
+                  characteristics.
                 </p>
               </div>
             )}
@@ -390,7 +388,7 @@ const MidiController: React.FC = () => {
                 className="w-full bg-indigo-400 hover:bg-cyan-400 text-white font-medium py-3 text-base"
                 size="lg"
               >
-                initialize audio
+              ♫♪ START |̲̅̅●̲̅̅|̲̅̅=̲̅̅|̲̅̅●̲̅̅| AUDIO ♫♪
               </Button>
             )}
           </CardContent>
