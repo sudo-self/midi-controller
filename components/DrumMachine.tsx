@@ -10,15 +10,21 @@ interface DrumMachineProps {
   masterGain: GainNode | null
 }
 
-type DrumSound = "kick" | "snare" | "cymbal" | "tom" | "snare2" | "siren" | "kick2" | "hihat" | "clap" | "cowbell" | "rimshot" | "laser"
+type DrumSound = "kick" | "snare" | "cymbal" | "tom" | "snare2" | "siren" | "kick2" | "openhat" | "clap" | "cowbell" | "rimshot" | "laser"
 
 type KitType = "kit1" | "kit2"
 
 const DrumMachine: React.FC<DrumMachineProps> = ({ audioContext, masterGain }) => {
   const [activePad, setActivePad] = useState<DrumSound | null>(null)
   const [activeKit, setActiveKit] = useState<KitType>("kit1")
+  const [isRepeating, setIsRepeating] = useState(false)
+  const [repeatSpeed, setRepeatSpeed] = useState(200) // ms between repeats
+  const [lastPlayedSound, setLastPlayedSound] = useState<DrumSound | null>(null)
+  
   const activeNodesRef = useRef<Map<DrumSound, AudioBufferSourceNode>>(new Map())
+  const repeatIntervalRef = useRef<NodeJS.Timeout | null>(null)
 
+  // KIT 1 Sounds (Original)
   const createKick = (ctx: AudioContext, destination: AudioNode) => {
     const osc = ctx.createOscillator()
     const gain = ctx.createGain()
@@ -245,7 +251,7 @@ const DrumMachine: React.FC<DrumMachineProps> = ({ audioContext, masterGain }) =
     return { osc1, osc2, gain, lfo, lfoGain }
   }
 
-  // KIT 2 Sounds (New Different Sounds)
+  // KIT 2 Sounds (DJ Sounds)
   const createKick2 = (ctx: AudioContext, destination: AudioNode) => {
     // More aggressive, punchy kick
     const osc1 = ctx.createOscillator()
@@ -286,9 +292,9 @@ const DrumMachine: React.FC<DrumMachineProps> = ({ audioContext, masterGain }) =
     return { osc1, osc2, gain1, gain2, masterGain }
   }
 
-  const createHihat = (ctx: AudioContext, destination: AudioNode) => {
-    // Bright hi-hat sound
-    const noiseBuffer = ctx.createBuffer(1, ctx.sampleRate * 0.1, ctx.sampleRate)
+  const createOpenhat = (ctx: AudioContext, destination: AudioNode) => {
+    // Open hi-hat sound - works better than closed hi-hat
+    const noiseBuffer = ctx.createBuffer(1, ctx.sampleRate * 0.3, ctx.sampleRate)
     const data = noiseBuffer.getChannelData(0)
     for (let i = 0; i < data.length; i++) {
       data[i] = Math.random() * 2 - 1
@@ -297,30 +303,29 @@ const DrumMachine: React.FC<DrumMachineProps> = ({ audioContext, masterGain }) =
     const noise = ctx.createBufferSource()
     noise.buffer = noiseBuffer
 
-    const filter = ctx.createBiquadFilter()
-    filter.type = "bandpass"
-    filter.frequency.value = 8000
-    filter.Q.value = 2
+    const filter1 = ctx.createBiquadFilter()
+    filter1.type = "highpass"
+    filter1.frequency.value = 6000
+
+    const filter2 = ctx.createBiquadFilter()
+    filter2.type = "peaking"
+    filter2.frequency.value = 8000
+    filter2.gain.value = 10
+    filter2.Q.value = 2
 
     const gain = ctx.createGain()
-    gain.gain.setValueAtTime(0.6, ctx.currentTime)
-    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1)
+    gain.gain.setValueAtTime(0.4, ctx.currentTime)
+    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4)
 
-    const compressor = ctx.createDynamicsCompressor()
-    compressor.threshold.value = -20
-    compressor.ratio.value = 8
-    compressor.attack.value = 0.001
-    compressor.release.value = 0.1
-
-    noise.connect(filter)
-    filter.connect(gain)
-    gain.connect(compressor)
-    compressor.connect(destination)
+    noise.connect(filter1)
+    filter1.connect(filter2)
+    filter2.connect(gain)
+    gain.connect(destination)
 
     noise.start(ctx.currentTime)
-    noise.stop(ctx.currentTime + 0.1)
+    noise.stop(ctx.currentTime + 0.3)
 
-    return { noise, filter, gain, compressor }
+    return { noise, filter1, filter2, gain }
   }
 
   const createClap = (ctx: AudioContext, destination: AudioNode) => {
@@ -453,7 +458,12 @@ const DrumMachine: React.FC<DrumMachineProps> = ({ audioContext, masterGain }) =
     if (!audioContext || !masterGain) return
 
     setActivePad(sound)
-    setTimeout(() => setActivePad(null), 150)
+    setLastPlayedSound(sound)
+    setTimeout(() => {
+      if (activePad === sound) {
+        setActivePad(null)
+      }
+    }, 150)
 
     try {
       switch (sound) {
@@ -480,8 +490,8 @@ const DrumMachine: React.FC<DrumMachineProps> = ({ audioContext, masterGain }) =
         case "kick2":
           createKick2(audioContext, masterGain)
           break
-        case "hihat":
-          createHihat(audioContext, masterGain)
+        case "openhat":
+          createOpenhat(audioContext, masterGain)
           break
         case "clap":
           createClap(audioContext, masterGain)
@@ -500,6 +510,49 @@ const DrumMachine: React.FC<DrumMachineProps> = ({ audioContext, masterGain }) =
       console.error("Error playing drum sound:", error)
     }
   }
+
+  const toggleRepeat = () => {
+    if (isRepeating) {
+      // Stop repeating
+      if (repeatIntervalRef.current) {
+        clearInterval(repeatIntervalRef.current)
+        repeatIntervalRef.current = null
+      }
+      setIsRepeating(false)
+    } else {
+      // Start repeating if there's a last played sound
+      if (lastPlayedSound) {
+        setIsRepeating(true)
+        repeatIntervalRef.current = setInterval(() => {
+          if (lastPlayedSound) {
+            playDrum(lastPlayedSound)
+          }
+        }, repeatSpeed)
+      }
+    }
+  }
+
+  const updateRepeatSpeed = (speed: number) => {
+    setRepeatSpeed(speed)
+    // If currently repeating, restart the interval with new speed
+    if (isRepeating && repeatIntervalRef.current) {
+      clearInterval(repeatIntervalRef.current)
+      repeatIntervalRef.current = setInterval(() => {
+        if (lastPlayedSound) {
+          playDrum(lastPlayedSound)
+        }
+      }, speed)
+    }
+  }
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (repeatIntervalRef.current) {
+        clearInterval(repeatIntervalRef.current)
+      }
+    }
+  }, [])
 
   // Keyboard controls
   useEffect(() => {
@@ -536,7 +589,7 @@ const DrumMachine: React.FC<DrumMachineProps> = ({ audioContext, masterGain }) =
             sound = "kick2"
             break
           case "2":
-            sound = "hihat"
+            sound = "openhat"
             break
           case "3":
             sound = "clap"
@@ -574,7 +627,7 @@ const DrumMachine: React.FC<DrumMachineProps> = ({ audioContext, masterGain }) =
 
   const kit2Pads = [
     { sound: "kick2" as DrumSound, label: "KICK2", color: "from-indigo-700 to-indigo-800", keyLabel: "1" },
-    { sound: "hihat" as DrumSound, label: "HI-HAT", color: "from-teal-600 to-teal-700", keyLabel: "2" },
+    { sound: "openhat" as DrumSound, label: "OPENHAT", color: "from-teal-600 to-teal-700", keyLabel: "2" },
     { sound: "clap" as DrumSound, label: "CLAP", color: "from-pink-600 to-pink-700", keyLabel: "3" },
     { sound: "cowbell" as DrumSound, label: "COWBELL", color: "from-orange-600 to-orange-700", keyLabel: "4" },
     { sound: "rimshot" as DrumSound, label: "RIMSHOT", color: "from-cyan-600 to-cyan-700", keyLabel: "5" },
@@ -625,7 +678,7 @@ const DrumMachine: React.FC<DrumMachineProps> = ({ audioContext, masterGain }) =
                 <div className="space-y-2">
                   <div className="text-center">
                     <span className="text-2xl font-bold text-white">
-                      {activeKit === "kit1" ? "CLASSIC KIT" : "ELECTRO KIT"}
+                      {activeKit === "kit1" ? "CLASSIC KIT" : "DJ KIT"}
                     </span>
                   </div>
                   
@@ -664,8 +717,8 @@ const DrumMachine: React.FC<DrumMachineProps> = ({ audioContext, masterGain }) =
                           <div className="text-zinc-400 text-xs">Punchy electro kick</div>
                         </div>
                         <div className="bg-teal-900/30 p-3 rounded-lg">
-                          <div className="text-teal-300 text-sm font-semibold">HI-HAT</div>
-                          <div className="text-zinc-400 text-xs">Bright closed hat</div>
+                          <div className="text-teal-300 text-sm font-semibold">OPENHAT</div>
+                          <div className="text-zinc-400 text-xs">Open hi-hat sound</div>
                         </div>
                         <div className="bg-pink-900/30 p-3 rounded-lg">
                           <div className="text-pink-300 text-sm font-semibold">CLAP</div>
@@ -735,12 +788,121 @@ const DrumMachine: React.FC<DrumMachineProps> = ({ audioContext, masterGain }) =
                 </button>
               ))}
             </div>
+
+            {/* DJ-style repeater controls */}
+            <div className="mt-6 bg-zinc-800/60 p-4 rounded-lg border border-zinc-700">
+              <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+                <div className="flex-1">
+                  <h3 className="text-white font-medium mb-2">Repeater</h3>
+                  <p className="text-zinc-300 text-sm">
+                    Play a sound, then activate repeater to create automatic patterns.
+                    Last played: <span className="font-mono text-white">
+                      {lastPlayedSound ? lastPlayedSound.toUpperCase() : "None"}
+                    </span>
+                  </p>
+                </div>
+                
+                <div className="flex flex-col md:flex-row items-center gap-4">
+                  {/* Repeater speed control */}
+                  <div className="flex items-center gap-2">
+                    <span className="text-zinc-300 text-sm">Speed:</span>
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => updateRepeatSpeed(Math.max(50, repeatSpeed - 50))}
+                        className="px-2 py-1 bg-zinc-700 rounded text-white hover:bg-zinc-600 text-sm"
+                        disabled={repeatSpeed <= 50}
+                      >
+                        −
+                      </button>
+                      <span className="text-white font-mono text-sm min-w-[60px] text-center">
+                        {repeatSpeed}ms
+                      </span>
+                      <button
+                        onClick={() => updateRepeatSpeed(Math.min(1000, repeatSpeed + 50))}
+                        className="px-2 py-1 bg-zinc-700 rounded text-white hover:bg-zinc-600 text-sm"
+                        disabled={repeatSpeed >= 1000}
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Repeater toggle button */}
+                  <button
+                    onClick={toggleRepeat}
+                    disabled={!lastPlayedSound}
+                    className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+                      isRepeating
+                        ? "bg-red-600 hover:bg-red-700 text-white animate-pulse"
+                        : lastPlayedSound
+                        ? "bg-green-600 hover:bg-green-700 text-white"
+                        : "bg-zinc-700 text-zinc-400 cursor-not-allowed"
+                    }`}
+                  >
+                    {isRepeating ? (
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-white rounded-full"></div>
+                        <span>Stop Repeat</span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <span>▶ Repeat</span>
+                      </div>
+                    )}
+                  </button>
+                </div>
+              </div>
+              
+              {/* Speed presets */}
+              <div className="flex flex-wrap gap-2 mt-4">
+                <button
+                  onClick={() => updateRepeatSpeed(400)}
+                  className={`px-3 py-1 text-xs rounded ${
+                    repeatSpeed === 400
+                      ? "bg-indigo-600 text-white"
+                      : "bg-zinc-700 text-zinc-300 hover:bg-zinc-600"
+                  }`}
+                >
+                  Slow (400ms)
+                </button>
+                <button
+                  onClick={() => updateRepeatSpeed(200)}
+                  className={`px-3 py-1 text-xs rounded ${
+                    repeatSpeed === 200
+                      ? "bg-indigo-600 text-white"
+                      : "bg-zinc-700 text-zinc-300 hover:bg-zinc-600"
+                  }`}
+                >
+                  Medium (200ms)
+                </button>
+                <button
+                  onClick={() => updateRepeatSpeed(100)}
+                  className={`px-3 py-1 text-xs rounded ${
+                    repeatSpeed === 100
+                      ? "bg-indigo-600 text-white"
+                      : "bg-zinc-700 text-zinc-300 hover:bg-zinc-600"
+                  }`}
+                >
+                  Fast (100ms)
+                </button>
+                <button
+                  onClick={() => updateRepeatSpeed(50)}
+                  className={`px-3 py-1 text-xs rounded ${
+                    repeatSpeed === 50
+                      ? "bg-indigo-600 text-white"
+                      : "bg-zinc-700 text-zinc-300 hover:bg-zinc-600"
+                  }`}
+                >
+                  Rapid (50ms)
+                </button>
+              </div>
+            </div>
           </div>
         </div>
         
         <div className="text-center pt-4 border-t border-zinc-700">
           <p className="text-zinc-400 text-sm">
-            Currently using <span className="font-semibold text-white">{activeKit === "kit1" ? "CLASSIC KIT" : "ELECTRO KIT"}</span> • 
+            Currently using <span className="font-semibold text-white">{activeKit === "kit1" ? "CLASSIC KIT" : "DJ KIT"}</span> • 
             Use keys <span className="font-mono text-white">1-6</span> • 
            Web Midi Music v.1
           </p>
