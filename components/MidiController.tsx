@@ -256,12 +256,12 @@ const MidiController: React.FC = () => {
         {/* Control Panel */}
         <Card className="bg-zinc-900/95 border-zinc-700 backdrop-blur-sm">
           <CardHeader className="pb-4">
-            <CardTitle className="text-white text-xl">Sound Controls</CardTitle>
+            <CardTitle className="text-white text-xl">JRs Web Midi v1.0</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             {/* Sound Mode Selection */}
             <div className="flex flex-wrap items-center gap-3">
-              <span className="text-white text-sm font-medium">Sound Mode:</span>
+              <span className="text-white text-sm font-medium">Music Mode:</span>
               <div className="flex gap-2">
                 <Button
                   variant={soundMode === "piano" ? "default" : "secondary"}
