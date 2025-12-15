@@ -8,6 +8,7 @@ import { PianoSynthesizer } from "./PianoSynthesizer"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import DrumMachine from "./DrumMachine"
+import LoopRecorder from "./LoopRecorder"
 
 interface AudioSettings {
   volume: number
@@ -392,6 +393,9 @@ const MidiController: React.FC = () => {
             )}
           </CardContent>
         </Card>
+
+        {/* Loop Recorder */}
+        <LoopRecorder audioContext={audioContext} masterGain={masterGainRef.current} />
 
         {/* Drum Machine */}
         <DrumMachine audioContext={audioContext} masterGain={masterGainRef.current} />
