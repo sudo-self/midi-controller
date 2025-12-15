@@ -10,7 +10,7 @@ interface DrumMachineProps {
   masterGain: GainNode | null
 }
 
-type DrumSound = "kick" | "snare" | "cymbal" | "tom"
+type DrumSound = "kick" | "snare" | "cymbal" | "tom" | "snare2" | "siren"
 
 const DrumMachine: React.FC<DrumMachineProps> = ({ audioContext, masterGain }) => {
   const [activePad, setActivePad] = useState<DrumSound | null>(null)
@@ -135,6 +135,114 @@ const DrumMachine: React.FC<DrumMachineProps> = ({ audioContext, masterGain }) =
     return { osc, gain }
   }
 
+  const createSnare2 = (ctx: AudioContext, destination: AudioNode) => {
+    // Create a more punchy snare with different characteristics
+    const noiseBuffer = ctx.createBuffer(1, ctx.sampleRate * 0.3, ctx.sampleRate)
+    const data = noiseBuffer.getChannelData(0)
+    for (let i = 0; i < data.length; i++) {
+      data[i] = Math.random() * 2 - 1
+    }
+
+    const noise = ctx.createBufferSource()
+    noise.buffer = noiseBuffer
+
+    const noiseFilter = ctx.createBiquadFilter()
+    noiseFilter.type = "bandpass"
+    noiseFilter.frequency.value = 1800
+    noiseFilter.Q.value = 1.5
+
+    const noiseGain = ctx.createGain()
+    noiseGain.gain.setValueAtTime(0.8, ctx.currentTime)
+    noiseGain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15)
+
+    // Add two tone oscillators for more body
+    const osc1 = ctx.createOscillator()
+    osc1.type = "sawtooth"
+    osc1.frequency.value = 180
+
+    const osc2 = ctx.createOscillator()
+    osc2.type = "sine"
+    osc2.frequency.value = 90
+
+    const oscGain = ctx.createGain()
+    oscGain.gain.setValueAtTime(0.6, ctx.currentTime)
+    oscGain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.08)
+
+    const compressor = ctx.createDynamicsCompressor()
+    compressor.threshold.value = -24
+    compressor.knee.value = 30
+    compressor.ratio.value = 12
+    compressor.attack.value = 0.003
+    compressor.release.value = 0.25
+
+    noise.connect(noiseFilter)
+    noiseFilter.connect(noiseGain)
+    noiseGain.connect(compressor)
+
+    osc1.connect(oscGain)
+    osc2.connect(oscGain)
+    oscGain.connect(compressor)
+
+    compressor.connect(destination)
+
+    noise.start(ctx.currentTime)
+    osc1.start(ctx.currentTime)
+    osc2.start(ctx.currentTime)
+    noise.stop(ctx.currentTime + 0.15)
+    osc1.stop(ctx.currentTime + 0.08)
+    osc2.stop(ctx.currentTime + 0.08)
+
+    return { noise, osc1, osc2, noiseGain, oscGain, compressor }
+  }
+
+  const createSiren = (ctx: AudioContext, destination: AudioNode) => {
+    const osc1 = ctx.createOscillator()
+    const osc2 = ctx.createOscillator()
+    const gain = ctx.createGain()
+    const lfo = ctx.createOscillator()
+    const lfoGain = ctx.createGain()
+
+    // Create a two-oscillator siren sound
+    osc1.type = "sawtooth"
+    osc1.frequency.value = 800
+
+    osc2.type = "sawtooth"
+    osc2.frequency.value = 805 // Slight detuning for chorus effect
+
+    // LFO for the siren effect
+    lfo.type = "sine"
+    lfo.frequency.value = 5 // 5 Hz siren rate
+    
+    lfoGain.gain.value = 400 // Modulation depth
+
+    // Connect LFO to both oscillators
+    lfo.connect(lfoGain)
+    lfoGain.connect(osc1.frequency)
+    lfoGain.connect(osc2.frequency)
+
+    // Volume envelope
+    gain.gain.setValueAtTime(0, ctx.currentTime)
+    gain.gain.linearRampToValueAtTime(0.5, ctx.currentTime + 0.05)
+    gain.gain.setValueAtTime(0.5, ctx.currentTime + 1.5)
+    gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 2)
+
+    osc1.connect(gain)
+    osc2.connect(gain)
+    gain.connect(destination)
+
+    // Start oscillators
+    osc1.start(ctx.currentTime)
+    osc2.start(ctx.currentTime)
+    lfo.start(ctx.currentTime)
+
+    // Stop after 2 seconds
+    osc1.stop(ctx.currentTime + 2)
+    osc2.stop(ctx.currentTime + 2)
+    lfo.stop(ctx.currentTime + 2)
+
+    return { osc1, osc2, gain, lfo, lfoGain }
+  }
+
   const playDrum = (sound: DrumSound) => {
     if (!audioContext || !masterGain) return
 
@@ -154,6 +262,12 @@ const DrumMachine: React.FC<DrumMachineProps> = ({ audioContext, masterGain }) =
           break
         case "tom":
           createTom(audioContext, masterGain)
+          break
+        case "snare2":
+          createSnare2(audioContext, masterGain)
+          break
+        case "siren":
+          createSiren(audioContext, masterGain)
           break
       }
     } catch (error) {
@@ -179,6 +293,12 @@ const DrumMachine: React.FC<DrumMachineProps> = ({ audioContext, masterGain }) =
         case "4":
           playDrum("tom")
           break
+        case "5":
+          playDrum("snare2")
+          break
+        case "6":
+          playDrum("siren")
+          break
       }
     }
 
@@ -191,6 +311,8 @@ const DrumMachine: React.FC<DrumMachineProps> = ({ audioContext, masterGain }) =
     { sound: "snare", label: "SNARE", color: "from-zinc-600 to-zinc-700", keyLabel: "2" },
     { sound: "cymbal", label: "CYMBAL", color: "from-zinc-700 to-zinc-800", keyLabel: "3" },
     { sound: "tom", label: "TOM", color: "from-zinc-600 to-zinc-700", keyLabel: "4" },
+    { sound: "snare2", label: "SNARE2", color: "from-amber-600 to-amber-700", keyLabel: "5" },
+    { sound: "siren", label: "SIREN", color: "from-red-600 to-red-700", keyLabel: "6" },
   ]
 
   return (
@@ -199,7 +321,7 @@ const DrumMachine: React.FC<DrumMachineProps> = ({ audioContext, masterGain }) =
         <CardTitle className="text-white text-xl text-center">Drum Machine</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid grid-cols-2 gap-4 max-w-2xl mx-auto">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 max-w-2xl mx-auto">
           {pads.map((pad) => (
             <button
               key={pad.sound}
@@ -231,7 +353,7 @@ const DrumMachine: React.FC<DrumMachineProps> = ({ audioContext, masterGain }) =
         </div>
         <div className="text-center">
           <p className="text-zinc-400 text-sm">
-            Click pads or press keys <span className="font-mono text-white">1, 2, 3, 4</span> to play drums
+            Click pads or press keys <span className="font-mono text-white">1-6</span> to play drums
           </p>
         </div>
       </CardContent>
