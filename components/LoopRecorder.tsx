@@ -10,28 +10,183 @@ interface LoopRecorderProps {
   masterGain: GainNode | null
 }
 
+// Define some sample tracks (you can replace these with your own)
+const SAMPLE_TRACKS = [
+  {
+    id: 1,
+    title: "Ambient Chill",
+    artist: "JR's Studio",
+    duration: 120, // 2 minutes
+    url: "https://assets.mixkit.co/music/preview/mixkit-tech-house-vibes-130.mp3",
+    color: "from-blue-600 to-indigo-600"
+  },
+  {
+    id: 2,
+    title: "Synth Waves",
+    artist: "Web MIDI",
+    duration: 90, // 1.5 minutes
+    url: "https://assets.mixkit.co/music/preview/mixkit-driving-ambition-32.mp3",
+    color: "from-purple-600 to-pink-600"
+  }
+]
+
 const LoopRecorder: React.FC<LoopRecorderProps> = ({ audioContext, masterGain }) => {
   const [isRecording, setIsRecording] = useState(false)
   const [isPlaying, setIsPlaying] = useState(false)
   const [recordedBuffer, setRecordedBuffer] = useState<AudioBuffer | null>(null)
   const [recordingTime, setRecordingTime] = useState(0)
 
+  // MP3 Player states
+  const [currentTrack, setCurrentTrack] = useState(0)
+  const [isMp3Playing, setIsMp3Playing] = useState(false)
+  const [currentTime, setCurrentTime] = useState(0)
+  const [volume, setVolume] = useState(0.7)
+  const [isLoading, setIsLoading] = useState(false)
+  
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const recordedChunksRef = useRef<Blob[]>([])
   const sourceNodeRef = useRef<AudioBufferSourceNode | null>(null)
   const recordingTimerRef = useRef<NodeJS.Timeout | null>(null)
   const destinationRef = useRef<MediaStreamAudioDestinationNode | null>(null)
+  
+  // MP3 Player refs
+  const audioRef = useRef<HTMLAudioElement | null>(null)
+  const progressIntervalRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
+    // Initialize audio element
+    if (typeof window !== 'undefined') {
+      audioRef.current = new Audio()
+      audioRef.current.volume = volume
+      
+      audioRef.current.addEventListener('timeupdate', () => {
+        if (audioRef.current) {
+          setCurrentTime(audioRef.current.currentTime)
+        }
+      })
+      
+      audioRef.current.addEventListener('ended', () => {
+        setIsMp3Playing(false)
+        setCurrentTime(0)
+        if (progressIntervalRef.current) {
+          clearInterval(progressIntervalRef.current)
+        }
+      })
+    }
+
     return () => {
       // Cleanup
       if (recordingTimerRef.current) {
         clearInterval(recordingTimerRef.current)
       }
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current)
+      }
       stopLoop()
+      stopMp3()
     }
   }, [])
 
+  // MP3 Player functions
+  const loadTrack = async (trackIndex: number) => {
+    if (!audioRef.current) return
+    
+    setIsLoading(true)
+    stopMp3()
+    setCurrentTrack(trackIndex)
+    setCurrentTime(0)
+    
+    try {
+      audioRef.current.src = SAMPLE_TRACKS[trackIndex].url
+      audioRef.current.load()
+      setIsLoading(false)
+    } catch (error) {
+      console.error("Error loading track:", error)
+      setIsLoading(false)
+    }
+  }
+
+  const toggleMp3Play = () => {
+    if (!audioRef.current || !SAMPLE_TRACKS[currentTrack]) return
+    
+    if (isMp3Playing) {
+      stopMp3()
+    } else {
+      playMp3()
+    }
+  }
+
+  const playMp3 = () => {
+    if (!audioRef.current) return
+    
+    try {
+      audioRef.current.play()
+      setIsMp3Playing(true)
+      
+      // Start progress updates
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current)
+      }
+      progressIntervalRef.current = setInterval(() => {
+        if (audioRef.current) {
+          setCurrentTime(audioRef.current.currentTime)
+        }
+      }, 100)
+    } catch (error) {
+      console.error("Error playing MP3:", error)
+    }
+  }
+
+  const stopMp3 = () => {
+    if (!audioRef.current) return
+    
+    audioRef.current.pause()
+    setIsMp3Playing(false)
+    
+    if (progressIntervalRef.current) {
+      clearInterval(progressIntervalRef.current)
+      progressIntervalRef.current = null
+    }
+  }
+
+  const seekMp3 = (time: number) => {
+    if (!audioRef.current) return
+    
+    audioRef.current.currentTime = time
+    setCurrentTime(time)
+  }
+
+  const nextTrack = () => {
+    const next = (currentTrack + 1) % SAMPLE_TRACKS.length
+    loadTrack(next)
+    if (isMp3Playing) {
+      setTimeout(playMp3, 100)
+    }
+  }
+
+  const prevTrack = () => {
+    const prev = (currentTrack - 1 + SAMPLE_TRACKS.length) % SAMPLE_TRACKS.length
+    loadTrack(prev)
+    if (isMp3Playing) {
+      setTimeout(playMp3, 100)
+    }
+  }
+
+  const updateVolume = (newVolume: number) => {
+    setVolume(newVolume)
+    if (audioRef.current) {
+      audioRef.current.volume = newVolume
+    }
+  }
+
+  // Format time (seconds to MM:SS)
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60)
+    const secs = Math.floor(seconds % 60)
+    return `${mins}:${secs.toString().padStart(2, '0')}`
+  }
+
+  // Original Loop Recorder functions
   const startRecording = async () => {
     if (!audioContext || !masterGain) return
 
@@ -149,81 +304,244 @@ const LoopRecorder: React.FC<LoopRecorderProps> = ({ audioContext, masterGain })
     recordedChunksRef.current = []
   }
 
+  // Load first track on mount
+  useEffect(() => {
+    if (SAMPLE_TRACKS.length > 0) {
+      loadTrack(0)
+    }
+  }, [])
+
+  const currentTrackData = SAMPLE_TRACKS[currentTrack]
+
   return (
-    <Card className="bg-zinc-900 border-zinc-700">
-      <CardHeader>
-        <CardTitle className="text-white">Loop Recorder</CardTitle>
+    <Card className="bg-gradient-to-br from-zinc-900/95 to-black border-zinc-800 backdrop-blur-sm">
+      <CardHeader className="pb-4 border-b border-zinc-800">
+        <CardTitle className="text-white text-xl flex items-center gap-2">
+          <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+          LOOP RECORDER & MP3 PLAYER
+        </CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="text-zinc-400 text-sm">
-              {isRecording ? (
-                <span className="flex items-center gap-2">
-                  <span className="inline-block w-3 h-3 bg-red-500 rounded-full animate-pulse"></span>
-                  Recording: {recordingTime.toFixed(1)}s / 10s
-                </span>
-              ) : recordedBuffer ? (
-                <span className="text-green-400">Loop ready ({recordedBuffer.duration.toFixed(1)}s)</span>
-              ) : (
-                <span>No recording</span>
+      <CardContent className="pt-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Left side - Loop Recorder */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="text-zinc-300 text-sm">
+                {isRecording ? (
+                  <span className="flex items-center gap-2">
+                    <span className="inline-block w-3 h-3 bg-red-500 rounded-full animate-pulse"></span>
+                    Recording: {recordingTime.toFixed(1)}s / 10s
+                  </span>
+                ) : recordedBuffer ? (
+                  <span className="text-green-400">Loop ready ({recordedBuffer.duration.toFixed(1)}s)</span>
+                ) : (
+                  <span>No loop recording</span>
+                )}
+              </div>
+            </div>
+
+            <div className="flex gap-2 flex-wrap">
+              {!isRecording && !recordedBuffer && (
+                <Button
+                  onClick={startRecording}
+                  disabled={!audioContext}
+                  className="bg-red-600 hover:bg-red-700 text-white"
+                >
+                  Record Loop (10s max)
+                </Button>
               )}
+
+              {isRecording && (
+                <Button onClick={stopRecording} className="bg-red-600 hover:bg-red-700 text-white">
+                  Stop Recording
+                </Button>
+              )}
+
+              {recordedBuffer && !isRecording && (
+                <>
+                  {!isPlaying ? (
+                    <Button onClick={playLoop} className="bg-green-600 hover:bg-green-700 text-white">
+                      Play Loop
+                    </Button>
+                  ) : (
+                    <Button onClick={stopLoop} className="bg-yellow-600 hover:bg-yellow-700 text-white">
+                      Stop Loop
+                    </Button>
+                  )}
+
+                  <Button
+                    onClick={clearRecording}
+                    variant="outline"
+                    className="border-zinc-600 text-zinc-300 hover:bg-zinc-800 bg-transparent"
+                  >
+                    Clear
+                  </Button>
+
+                  <Button
+                    onClick={startRecording}
+                    variant="outline"
+                    className="border-zinc-600 text-zinc-300 hover:bg-zinc-800 bg-transparent"
+                  >
+                    Record New
+                  </Button>
+                </>
+              )}
+            </div>
+
+            <div className="bg-zinc-800/50 p-3 rounded-lg border border-zinc-700/50">
+              <p className="text-zinc-300 text-xs">
+                Record up to 10 seconds of audio and play it back in a continuous loop. 
+                Mix with the piano or drum machine while playing.
+              </p>
             </div>
           </div>
 
-          <div className="flex gap-2 flex-wrap">
-            {!isRecording && !recordedBuffer && (
-              <Button
-                onClick={startRecording}
-                disabled={!audioContext}
-                className="bg-red-600 hover:bg-red-700 text-white"
-              >
-                Record (10s max)
-              </Button>
-            )}
+          {/* Right side - MP3 Player */}
+          <div className="space-y-4">
+            {/* Track Selection */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-white text-sm font-medium">TRACK SELECT</span>
+                <span className="text-zinc-400 text-xs">
+                  {currentTrack + 1} of {SAMPLE_TRACKS.length}
+                </span>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-2">
+                {SAMPLE_TRACKS.map((track, index) => (
+                  <button
+                    key={track.id}
+                    onClick={() => loadTrack(index)}
+                    className={`p-3 rounded-lg border transition-all duration-200 ${
+                      currentTrack === index
+                        ? `bg-gradient-to-br ${track.color} border-transparent text-white shadow-lg`
+                        : 'bg-zinc-800/50 border-zinc-700 text-zinc-400 hover:bg-zinc-700/50'
+                    }`}
+                  >
+                    <div className="text-xs font-semibold mb-1">{track.title}</div>
+                    <div className="text-xs opacity-75">{track.artist}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
 
-            {isRecording && (
-              <Button onClick={stopRecording} className="bg-red-600 hover:bg-red-700 text-white">
-                Stop Recording
-              </Button>
-            )}
-
-            {recordedBuffer && !isRecording && (
-              <>
-                {!isPlaying ? (
-                  <Button onClick={playLoop} className="bg-green-600 hover:bg-green-700 text-white">
-                    Play Loop
-                  </Button>
-                ) : (
-                  <Button onClick={stopLoop} className="bg-yellow-600 hover:bg-yellow-700 text-white">
-                    Stop Loop
-                  </Button>
+            {/* Current Track Info */}
+            <div className={`p-4 rounded-lg bg-gradient-to-br ${currentTrackData.color}/20 border ${currentTrackData.color}/30`}>
+              <div className="flex items-center justify-between mb-3">
+                <div>
+                  <div className="text-white font-medium">{currentTrackData.title}</div>
+                  <div className="text-zinc-300 text-sm">{currentTrackData.artist}</div>
+                </div>
+                {isLoading && (
+                  <div className="text-xs text-amber-400 animate-pulse">Loading...</div>
                 )}
+              </div>
 
-                <Button
-                  onClick={clearRecording}
-                  variant="outline"
-                  className="border-zinc-600 text-zinc-300 hover:bg-zinc-800 bg-transparent"
-                >
-                  Clear
-                </Button>
+              {/* Progress Bar */}
+              <div className="space-y-2">
+                <div className="flex justify-between text-xs text-zinc-400">
+                  <span>{formatTime(currentTime)}</span>
+                  <span>{formatTime(currentTrackData.duration)}</span>
+                </div>
+                <div className="relative h-2 bg-zinc-800 rounded-full overflow-hidden">
+                  <div 
+                    className="absolute top-0 left-0 h-full bg-gradient-to-r from-white to-zinc-300"
+                    style={{ width: `${(currentTime / currentTrackData.duration) * 100}%` }}
+                  />
+                  <input
+                    type="range"
+                    min="0"
+                    max={currentTrackData.duration}
+                    value={currentTime}
+                    onChange={(e) => seekMp3(parseFloat(e.target.value))}
+                    className="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer"
+                  />
+                </div>
+              </div>
 
-                <Button
-                  onClick={startRecording}
-                  variant="outline"
-                  className="border-zinc-600 text-zinc-300 hover:bg-zinc-800 bg-transparent"
-                >
-                  Record New
-                </Button>
-              </>
-            )}
-          </div>
+              {/* Controls */}
+              <div className="flex items-center justify-between mt-4">
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={prevTrack}
+                    className="text-zinc-300 hover:text-white"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    </svg>
+                  </Button>
+                  
+                  <Button
+                    onClick={toggleMp3Play}
+                    className={`${
+                      isMp3Playing 
+                        ? 'bg-red-600 hover:bg-red-700' 
+                        : 'bg-green-600 hover:bg-green-700'
+                    } text-white px-6`}
+                    disabled={isLoading}
+                  >
+                    {isMp3Playing ? (
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    ) : (
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    )}
+                  </Button>
+                  
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={nextTrack}
+                    className="text-zinc-300 hover:text-white"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </Button>
+                </div>
 
-          <div className="bg-zinc-800 p-3 rounded-lg">
-            <p className="text-zinc-400 text-xs">
-              Record up to 10 seconds of audio and play it back in a continuous loop. You can play over the loop with
-              the piano keyboard while it's playing.
-            </p>
+                {/* Volume Control */}
+                <div className="flex items-center gap-2">
+                  <svg className="w-4 h-4 text-zinc-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.984 5.984 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.983 3.983 0 00-1.172-2.828 1 1 0 010-1.415z" clipRule="evenodd" />
+                  </svg>
+                  <div className="flex items-center gap-1 w-24">
+                    <input
+                      type="range"
+                      min="0"
+                      max="1"
+                      step="0.1"
+                      value={volume}
+                      onChange={(e) => updateVolume(parseFloat(e.target.value))}
+                      className="w-full accent-white"
+                    />
+                    <span className="text-xs text-zinc-400 w-8 text-right">
+                      {Math.round(volume * 100)}%
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Player Status */}
+            <div className="bg-zinc-800/30 p-3 rounded-lg">
+              <div className="flex items-center justify-between">
+                <span className="text-zinc-300 text-sm">Player Status</span>
+                <div className={`px-2 py-1 rounded text-xs ${
+                  isMp3Playing ? 'bg-green-900/50 text-green-300' : 
+                  isLoading ? 'bg-amber-900/50 text-amber-300' : 
+                  'bg-zinc-900/50 text-zinc-300'
+                }`}>
+                  {isLoading ? 'LOADING' : isMp3Playing ? 'PLAYING' : 'STOPPED'}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </CardContent>
