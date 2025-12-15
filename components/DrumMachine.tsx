@@ -4,8 +4,6 @@ import type React from "react"
 
 import { useState, useRef, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Switch } from "@/components/ui/switch"
-import { Label } from "@/components/ui/label"
 
 interface DrumMachineProps {
   audioContext: AudioContext | null
@@ -586,6 +584,32 @@ const DrumMachine: React.FC<DrumMachineProps> = ({ audioContext, masterGain }) =
 
   const currentPads = activeKit === "kit1" ? kit1Pads : kit2Pads
 
+  // Custom Toggle Component
+  const CustomToggle = () => (
+    <div className="flex items-center justify-between">
+      <div className="text-white font-medium text-lg">Drum Kits</div>
+      <div className="flex items-center space-x-2">
+        <span className={`text-sm ${activeKit === "kit1" ? "text-blue-300 font-semibold" : "text-zinc-300"}`}>
+          KIT 1
+        </span>
+        <button
+          onClick={() => setActiveKit(activeKit === "kit1" ? "kit2" : "kit1")}
+          className="relative inline-flex h-6 w-11 items-center rounded-full bg-zinc-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-zinc-900"
+          aria-label={`Switch to ${activeKit === "kit1" ? "Kit 2" : "Kit 1"}`}
+        >
+          <span
+            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+              activeKit === "kit2" ? "translate-x-6" : "translate-x-1"
+            }`}
+          />
+        </button>
+        <span className={`text-sm ${activeKit === "kit2" ? "text-indigo-300 font-semibold" : "text-zinc-300"}`}>
+          KIT 2
+        </span>
+      </div>
+    </div>
+  )
+
   return (
     <Card className="bg-zinc-900/95 border-zinc-700 backdrop-blur-sm">
       <CardHeader className="pb-4">
@@ -597,21 +621,7 @@ const DrumMachine: React.FC<DrumMachineProps> = ({ audioContext, masterGain }) =
           <div className="lg:w-1/3 space-y-6">
             <div className="bg-zinc-800/60 p-4 rounded-lg border border-zinc-700">
               <div className="flex flex-col space-y-4">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="kit-switch" className="text-white font-medium text-lg">
-                    Drum Kits
-                  </Label>
-                  <div className="flex items-center space-x-2">
-                    <span className="text-zinc-300 text-sm">KIT 1</span>
-                    <Switch
-                      id="kit-switch"
-                      checked={activeKit === "kit2"}
-                      onCheckedChange={(checked) => setActiveKit(checked ? "kit2" : "kit1")}
-                      className="data-[state=checked]:bg-blue-500"
-                    />
-                    <span className="text-zinc-300 text-sm">KIT 2</span>
-                  </div>
-                </div>
+                <CustomToggle />
                 
                 <div className="space-y-2">
                   <div className="text-center">
@@ -731,9 +741,9 @@ const DrumMachine: React.FC<DrumMachineProps> = ({ audioContext, masterGain }) =
         
         <div className="text-center pt-4 border-t border-zinc-700">
           <p className="text-zinc-400 text-sm">
-            Drum Machine <span className="font-semibold text-white">{activeKit === "kit1" ? "CLASSIC KIT" : "ELECTRO KIT"}</span> • 
+            Currently using <span className="font-semibold text-white">{activeKit === "kit1" ? "CLASSIC KIT" : "ELECTRO KIT"}</span> • 
             Use keys <span className="font-mono text-white">1-6</span> • 
-            Switch kits
+            Switch kits with the toggle above
           </p>
         </div>
       </CardContent>
