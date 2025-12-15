@@ -446,6 +446,31 @@ const MidiController: React.FC = () => {
               <DrumMachine audioContext={audioContext} masterGain={masterGainRef.current} />
             </div>
 
+            {/* Storm Visualization Iframe - Added right above the piano */}
+            <div className="relative">
+              <div className="absolute -inset-1 bg-gradient-to-r from-purple-500/10 to-pink-500/10 blur-lg rounded-xl"></div>
+              <Card className="bg-gradient-to-br from-zinc-900/95 to-black border-zinc-800 backdrop-blur-sm">
+                <CardHeader className="pb-4 border-b border-zinc-800">
+                  <CardTitle className="text-white text-xl flex items-center gap-2">
+                    <div className="w-3 h-3 bg-purple-500 rounded-full animate-pulse"></div>
+                    STORM VISUALIZER
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="py-4 flex justify-center">
+                  <iframe 
+                    src="https://storm.jessejesse.com/" 
+                    width="300" 
+                    height="300"
+                    className="rounded-lg border-2 border-purple-800/50 shadow-lg shadow-purple-500/20"
+                    style={{ minWidth: '300px', minHeight: '300px' }}
+                    title="Storm Visualizer"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                </CardContent>
+              </Card>
+            </div>
+
             {/* Piano */}
             <div className="relative">
               <div className="absolute -inset-1 bg-gradient-to-r from-purple-500/10 to-pink-500/10 blur-lg rounded-xl"></div>
@@ -516,6 +541,10 @@ const MidiController: React.FC = () => {
                       <li className="flex items-start gap-2">
                         <span className="text-amber-400">▶</span>
                         <span>Switch between Piano/Synth modes</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-amber-400">▶</span>
+                        <span>Watch the storm visualizer react to music</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <span className="text-amber-400">▶</span>
