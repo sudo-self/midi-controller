@@ -7,8 +7,10 @@ import ControlKnob from "./ControlKnob"
 import { PianoSynthesizer } from "./PianoSynthesizer"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import DrumMachine from "./DrumMachine"
 import LoopRecorder from "./LoopRecorder"
+import DrumMachine from "./DrumMachine"
+
+// The rest of the MidiController.tsx remains the same
 
 interface AudioSettings {
   volume: number
