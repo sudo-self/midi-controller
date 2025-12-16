@@ -307,10 +307,10 @@ const MidiController: React.FC = () => {
           <div className="flex items-center justify-center gap-3 text-zinc-300">
             <div className="flex items-center gap-1">
               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-              <span className="text-sm">LIVE</span>
+              <span className="text-sm">JRs</span>
             </div>
             <span className="text-sm">•</span>
-            <p className="text-sm">SYNTHESIZER • PIANO • DRUM KIT • LOOP RECORDER • MP3 Player </p>
+            <p className="text-sm">web-midi-music.vercel.app</p>
             <span className="text-sm">•</span>
             <div className="flex items-center gap-1">
               <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
@@ -366,7 +366,6 @@ const MidiController: React.FC = () => {
             
             {/* Global Audio Status */}
             <div className="flex items-center gap-2">
-              <div className="text-xs text-zinc-500">AUDIO STATUS:</div>
               <div className="flex items-center gap-1">
                 <div className={`w-2 h-2 rounded-full ${isPlaying ? 'animate-pulse bg-green-500' : 'bg-red-500'}`}></div>
                 <span className={`text-xs font-medium ${isPlaying ? 'text-green-400' : 'text-red-400'}`}>
