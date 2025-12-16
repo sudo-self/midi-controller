@@ -47,6 +47,19 @@ const MidiController: React.FC = () => {
   })
 
   const [waveform, setWaveform] = useState<OscillatorType>("sine")
+  
+  // State for visual feedback dots - tracks recent button presses
+  const [visualFeedback, setVisualFeedback] = useState<{
+    synth: boolean;
+    piano: boolean;
+    drums: boolean;
+    loop: boolean;
+  }>({
+    synth: false,
+    piano: false,
+    drums: false,
+    loop: false
+  })
 
   // Add drum machine ref to control it directly
   const drumMachineRef = useRef<any>(null)
@@ -61,6 +74,22 @@ const MidiController: React.FC = () => {
       }
     }
   }, [])
+
+  // Function to trigger visual feedback
+  const triggerVisualFeedback = (type: keyof typeof visualFeedback) => {
+    setVisualFeedback(prev => ({
+      ...prev,
+      [type]: true
+    }))
+    
+    // Automatically turn off after 200ms (adjust for desired duration)
+    setTimeout(() => {
+      setVisualFeedback(prev => ({
+        ...prev,
+        [type]: false
+      }))
+    }, 200)
+  }
 
   const stopAllNotes = () => {
     // Stop all piano notes
@@ -141,6 +170,9 @@ const MidiController: React.FC = () => {
       console.warn("Audio not initialized")
       return
     }
+
+    // Trigger visual feedback for piano/synth notes
+    triggerVisualFeedback(soundMode === "piano" ? "piano" : "synth")
 
     // Stop existing note if playing (important for retriggering)
     stopNote(note)
@@ -261,13 +293,6 @@ const MidiController: React.FC = () => {
     }
   }
 
-  // Add function to trigger drum machine externally if needed
-  const triggerDrumSound = (soundName: string) => {
-    if (drumMachineRef.current && typeof drumMachineRef.current.playSound === 'function') {
-      drumMachineRef.current.playSound(soundName)
-    }
-  }
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-black via-zinc-950 to-black p-4 md:p-6 overflow-x-hidden">
       <div className="max-w-[1400px] mx-auto space-y-6">
@@ -294,6 +319,64 @@ const MidiController: React.FC = () => {
           </div>
         </div>
 
+        {/* Visual Feedback Status Bar */}
+        <div className="bg-zinc-900/50 backdrop-blur-sm rounded-xl p-3 border border-zinc-800">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              {/* SYNTH STATUS */}
+              <div className="flex items-center gap-2">
+                <div className={`w-3 h-3 rounded-full transition-all duration-200 ${
+                  visualFeedback.synth 
+                    ? "bg-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.8)]" 
+                    : "bg-zinc-700"
+                }`}></div>
+                <span className="text-xs text-zinc-400 font-medium">SYNTH</span>
+              </div>
+              
+              {/* PIANO STATUS */}
+              <div className="flex items-center gap-2">
+                <div className={`w-3 h-3 rounded-full transition-all duration-200 ${
+                  visualFeedback.piano 
+                    ? "bg-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.8)]" 
+                    : "bg-zinc-700"
+                }`}></div>
+                <span className="text-xs text-zinc-400 font-medium">PIANO</span>
+              </div>
+              
+              {/* DRUMS STATUS */}
+              <div className="flex items-center gap-2">
+                <div className={`w-3 h-3 rounded-full transition-all duration-200 ${
+                  visualFeedback.drums 
+                    ? "bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.8)]" 
+                    : "bg-zinc-700"
+                }`}></div>
+                <span className="text-xs text-zinc-400 font-medium">DRUMS</span>
+              </div>
+              
+              {/* LOOP STATUS */}
+              <div className="flex items-center gap-2">
+                <div className={`w-3 h-3 rounded-full transition-all duration-200 ${
+                  visualFeedback.loop 
+                    ? "bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.8)]" 
+                    : "bg-zinc-700"
+                }`}></div>
+                <span className="text-xs text-zinc-400 font-medium">LOOP</span>
+              </div>
+            </div>
+            
+            {/* Global Audio Status */}
+            <div className="flex items-center gap-2">
+              <div className="text-xs text-zinc-500">AUDIO STATUS:</div>
+              <div className="flex items-center gap-1">
+                <div className={`w-2 h-2 rounded-full ${isPlaying ? 'animate-pulse bg-green-500' : 'bg-red-500'}`}></div>
+                <span className={`text-xs font-medium ${isPlaying ? 'text-green-400' : 'text-red-400'}`}>
+                  {isPlaying ? 'ACTIVE' : 'STANDBY'}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Main Control Deck - Split Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column - Synthesizer Controls */}
@@ -301,7 +384,11 @@ const MidiController: React.FC = () => {
             <Card className="bg-gradient-to-br from-zinc-900/95 to-black border-zinc-800 backdrop-blur-sm">
               <CardHeader className="pb-4 border-b border-zinc-800">
                 <CardTitle className="text-white text-xl flex items-center gap-2">
-                  <div className="w-3 h-3 bg-cyan-500 rounded-full animate-pulse"></div>
+                  <div className={`w-3 h-3 rounded-full transition-all duration-200 ${
+                    visualFeedback.synth 
+                      ? "bg-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.8)]" 
+                      : "bg-cyan-500 animate-pulse"
+                  }`}></div>
                   SYNTHESIZER
                 </CardTitle>
               </CardHeader>
@@ -317,6 +404,7 @@ const MidiController: React.FC = () => {
                         onClick={() => {
                           stopAllNotes()
                           setSoundMode("piano")
+                          triggerVisualFeedback("piano")
                         }}
                         className={`${
                           soundMode === "piano"
@@ -332,6 +420,7 @@ const MidiController: React.FC = () => {
                         onClick={() => {
                           stopAllNotes()
                           setSoundMode("oscillator")
+                          triggerVisualFeedback("synth")
                         }}
                         className={`${
                           soundMode === "oscillator"
@@ -357,7 +446,10 @@ const MidiController: React.FC = () => {
                             key={wave}
                             variant="outline"
                             size="sm"
-                            onClick={() => setWaveform(wave)}
+                            onClick={() => {
+                              setWaveform(wave)
+                              triggerVisualFeedback("synth")
+                            }}
                             className={`${
                               waveform === wave
                                 ? "bg-cyan-500/20 border-cyan-500 text-cyan-300"
@@ -458,60 +550,34 @@ const MidiController: React.FC = () => {
                   </div>
                 )}
 
-                {/* Drum Test Buttons */}
+                {/* Sound Effects */}
                 <div className="pt-4">
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="text-center">
-                      <div className="text-white text-sm font-medium mb-2">Test Drum 1</div>
-                      <Button 
-                        onClick={() => triggerDrumSound('kick')}
-                        className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
-                        size="sm"
-                      >
-                        KICK
-                      </Button>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-white text-sm font-medium mb-2">Test Drum 2</div>
-                      <Button 
-                        onClick={() => triggerDrumSound('snare')}
-                        className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700"
-                        size="sm"
-                      >
-                        SNARE
-                      </Button>
-                    </div>
-                  </div>
-                  
-                  {/* Pew Pew and FAAAH Buttons */}
-                  <div className="mt-4">
-                    <div className="text-center">
-                      <div className="text-white text-sm font-medium mb-2">Sound Effects</div>
-                      <div className="grid grid-cols-2 gap-3">
-                        <div className="text-center">
-                          <div className="text-white text-sm font-medium mb-2">Pew Pew</div>
-                          <iframe 
-                            width="110" 
-                            height="200" 
-                            src="https://www.myinstants.com/instant/pew_pew/embed/" 
-                            frameBorder="0" 
-                            scrolling="no"
-                            className="border-0 rounded-lg mx-auto"
-                            title="Pew Pew Sound"
-                          />
-                        </div>
-                        <div className="text-center">
-                          <div className="text-white text-sm font-medium mb-2">FAAAH</div>
-                          <iframe 
-                            width="110" 
-                            height="200" 
-                            src="https://www.myinstants.com/instant/faaah-63455/embed/" 
-                            frameBorder="0" 
-                            scrolling="no"
-                            className="border-0 rounded-lg mx-auto"
-                            title="FAAAH Sound"
-                          />
-                        </div>
+                  <div className="text-center">
+                    <div className="text-white text-sm font-medium mb-2">Sound Effects</div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="text-center">
+                        <div className="text-white text-sm font-medium mb-2">Pew Pew</div>
+                        <iframe 
+                          width="110" 
+                          height="200" 
+                          src="https://www.myinstants.com/instant/pew_pew/embed/" 
+                          frameBorder="0" 
+                          scrolling="no"
+                          className="border-0 rounded-lg mx-auto"
+                          title="Pew Pew Sound"
+                        />
+                      </div>
+                      <div className="text-center">
+                        <div className="text-white text-sm font-medium mb-2">FAAAH</div>
+                        <iframe 
+                          width="110" 
+                          height="200" 
+                          src="https://www.myinstants.com/instant/faaah-63455/embed/" 
+                          frameBorder="0" 
+                          scrolling="no"
+                          className="border-0 rounded-lg mx-auto"
+                          title="FAAAH Sound"
+                        />
                       </div>
                     </div>
                   </div>
@@ -529,12 +595,27 @@ const MidiController: React.FC = () => {
             {/* Drum Machine */}
             <div className="relative">
               <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500/10 to-cyan-500/10 blur-lg rounded-xl"></div>
-              <DrumMachine 
-                ref={drumMachineRef}
-                audioContext={audioContext} 
-                masterGain={masterGainRef.current}
-                isAudioActive={isPlaying}
-              />
+              <Card className="bg-gradient-to-br from-zinc-900/95 to-black border-zinc-800 backdrop-blur-sm">
+                <CardHeader className="pb-4 border-b border-zinc-800">
+                  <CardTitle className="text-white text-xl flex items-center gap-2">
+                    <div className={`w-3 h-3 rounded-full transition-all duration-200 ${
+                      visualFeedback.drums 
+                        ? "bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.8)]" 
+                        : "bg-indigo-500 animate-pulse"
+                    }`}></div>
+                    DRUM MACHINE
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <DrumMachine 
+                    ref={drumMachineRef}
+                    audioContext={audioContext} 
+                    masterGain={masterGainRef.current}
+                    isAudioActive={isPlaying}
+                    onPlaySound={() => triggerVisualFeedback("drums")}
+                  />
+                </CardContent>
+              </Card>
             </div>
 
             {/* Piano container */}
@@ -543,7 +624,11 @@ const MidiController: React.FC = () => {
               <Card className="bg-gradient-to-br from-zinc-900/95 to-black border-zinc-800 backdrop-blur-sm">
                 <CardHeader className="pb-4 border-b border-zinc-800">
                   <CardTitle className="text-white text-xl flex items-center gap-2">
-                    <div className="w-3 h-3 bg-purple-500 rounded-full animate-pulse"></div>
+                    <div className={`w-3 h-3 rounded-full transition-all duration-200 ${
+                      visualFeedback.piano 
+                        ? "bg-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.8)]" 
+                        : "bg-purple-500 animate-pulse"
+                    }`}></div>
                     PIANO KEYBOARD
                   </CardTitle>
                 </CardHeader>
@@ -563,7 +648,27 @@ const MidiController: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Loop Recorder */}
           <div className="lg:col-span-2">
-            <LoopRecorder audioContext={audioContext} masterGain={masterGainRef.current} />
+            <Card className="bg-gradient-to-br from-zinc-900/95 to-black border-zinc-800 backdrop-blur-sm h-full">
+              <CardHeader className="pb-4 border-b border-zinc-800">
+                <CardTitle className="text-white text-xl flex items-center gap-2">
+                  <div className={`w-3 h-3 rounded-full transition-all duration-200 ${
+                    visualFeedback.loop 
+                      ? "bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.8)]" 
+                      : "bg-amber-500"
+                  }`}></div>
+                  LOOP RECORDER
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <LoopRecorder 
+                  audioContext={audioContext} 
+                  masterGain={masterGainRef.current}
+                  onRecordingChange={(isRecording) => {
+                    if (isRecording) triggerVisualFeedback("loop")
+                  }}
+                />
+              </CardContent>
+            </Card>
           </div>
 
           {/* Instructions Panel */}
@@ -606,11 +711,7 @@ const MidiController: React.FC = () => {
                       </li>
                       <li className="flex items-start gap-2">
                         <span className="text-amber-400">▶</span>
-                        <span>Use Drum Machine for beat patterns</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <span className="text-amber-400">▶</span>
-                        <span>Click drum pads to play sounds</span>
+                        <span>Watch status lights for instrument activity</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <span className="text-amber-400">▶</span>
@@ -620,22 +721,33 @@ const MidiController: React.FC = () => {
                         <span className="text-amber-400">▶</span>
                         <span>Record loops with Loop Recorder</span>
                       </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-amber-400">▶</span>
+                        <span>Play MP3 tracks for background music</span>
+                      </li>
                     </ul>
                   </div>
 
-                  {/* Audio Status */}
+                  {/* Visual Legend */}
                   <div className="bg-zinc-800/30 p-3 rounded-lg">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-white text-xs font-medium">AUDIO STATUS</span>
-                      <div className={`px-2 py-1 rounded text-xs ${isPlaying ? 'bg-green-900/50 text-green-300' : 'bg-red-900/50 text-red-300'}`}>
-                        {isPlaying ? 'ACTIVE' : 'STANDBY'}
+                    <h4 className="text-white text-xs font-medium mb-2">VISUAL STATUS</h4>
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-cyan-500 rounded-full"></div>
+                        <span className="text-zinc-300 text-xs">SYNTH - Oscillator mode active</span>
                       </div>
-                    </div>
-                    <div className="w-full bg-zinc-800 h-1 rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-gradient-to-r from-green-500 to-cyan-500 transition-all duration-300"
-                        style={{ width: isPlaying ? '100%' : '30%' }}
-                      ></div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                        <span className="text-zinc-300 text-xs">PIANO - Piano mode active</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-indigo-500 rounded-full"></div>
+                        <span className="text-zinc-300 text-xs">DRUMS - Pad triggered</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-amber-500 rounded-full"></div>
+                        <span className="text-zinc-300 text-xs">LOOP - Recording active</span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -648,7 +760,7 @@ const MidiController: React.FC = () => {
         <div className="text-center py-4 border-t border-zinc-800/50">
           <div className="flex flex-col md:flex-row items-center justify-between gap-3">
             <p className="text-zinc-500 text-sm">
-              WEB MIDI MUSIC • HQ Web Audio API • Drums Fixed
+              WEB MIDI MUSIC • HQ Web Audio API • Visual Feedback System
             </p>
             <div className="flex items-center gap-4">
               <a
