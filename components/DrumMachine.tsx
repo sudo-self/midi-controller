@@ -617,21 +617,21 @@ const DrumMachine: React.FC<DrumMachineProps> = ({ audioContext, masterGain }) =
 
   // Define pads for each kit
   const kit1Pads = [
-    { sound: "kick" as DrumSound, label: "KICK", color: "from-blue-700 to-blue-800", keyLabel: "1" },
-    { sound: "snare" as DrumSound, label: "SNARE", color: "from-green-600 to-green-700", keyLabel: "2" },
-    { sound: "cymbal" as DrumSound, label: "CYMBAL", color: "from-yellow-600 to-yellow-700", keyLabel: "3" },
-    { sound: "tom" as DrumSound, label: "TOM", color: "from-purple-600 to-purple-700", keyLabel: "4" },
-    { sound: "snare2" as DrumSound, label: "SNARE2", color: "from-amber-600 to-amber-700", keyLabel: "5" },
-    { sound: "siren" as DrumSound, label: "SIREN", color: "from-red-600 to-red-700", keyLabel: "6" },
+    { sound: "kick" as DrumSound, label: "", color: "from-blue-700 to-blue-800", keyLabel: "1" },
+    { sound: "snare" as DrumSound, label: "", color: "from-green-600 to-green-700", keyLabel: "2" },
+    { sound: "cymbal" as DrumSound, label: "", color: "from-yellow-600 to-yellow-700", keyLabel: "3" },
+    { sound: "tom" as DrumSound, label: "", color: "from-purple-600 to-purple-700", keyLabel: "4" },
+    { sound: "snare2" as DrumSound, label: "", color: "from-amber-600 to-amber-700", keyLabel: "5" },
+    { sound: "siren" as DrumSound, label: "", color: "from-red-600 to-red-700", keyLabel: "6" },
   ]
 
   const kit2Pads = [
-    { sound: "kick2" as DrumSound, label: "KICK2", color: "from-indigo-700 to-indigo-800", keyLabel: "1" },
-    { sound: "openhat" as DrumSound, label: "OPENHAT", color: "from-teal-600 to-teal-700", keyLabel: "2" },
-    { sound: "clap" as DrumSound, label: "CLAP", color: "from-pink-600 to-pink-700", keyLabel: "3" },
-    { sound: "cowbell" as DrumSound, label: "COWBELL", color: "from-orange-600 to-orange-700", keyLabel: "4" },
-    { sound: "rimshot" as DrumSound, label: "RIMSHOT", color: "from-cyan-600 to-cyan-700", keyLabel: "5" },
-    { sound: "laser" as DrumSound, label: "LASER", color: "from-violet-600 to-violet-700", keyLabel: "6" },
+    { sound: "kick2" as DrumSound, label: "", color: "from-indigo-700 to-indigo-800", keyLabel: "1" },
+    { sound: "openhat" as DrumSound, label: "", color: "from-teal-600 to-teal-700", keyLabel: "2" },
+    { sound: "clap" as DrumSound, label: "", color: "from-pink-600 to-pink-700", keyLabel: "3" },
+    { sound: "cowbell" as DrumSound, label: "", color: "from-orange-600 to-orange-700", keyLabel: "4" },
+    { sound: "rimshot" as DrumSound, label: "", color: "from-cyan-600 to-cyan-700", keyLabel: "5" },
+    { sound: "laser" as DrumSound, label: "", color: "from-violet-600 to-violet-700", keyLabel: "6" },
   ]
 
   const currentPads = activeKit === "kit1" ? kit1Pads : kit2Pads
@@ -639,7 +639,7 @@ const DrumMachine: React.FC<DrumMachineProps> = ({ audioContext, masterGain }) =
   // Custom Toggle Component
   const CustomToggle = () => (
     <div className="flex items-center justify-between">
-      <div className="text-white font-medium text-lg">Drum Kits</div>
+      <div className="text-white font-medium text-lg">web-midi-music</div>
       <div className="flex items-center space-x-2">
         <span className={`text-sm ${activeKit === "kit1" ? "text-blue-300 font-semibold" : "text-zinc-300"}`}>
           Classic Kit
@@ -665,7 +665,7 @@ const DrumMachine: React.FC<DrumMachineProps> = ({ audioContext, masterGain }) =
   return (
     <Card className="bg-zinc-900/95 border-zinc-700 backdrop-blur-sm">
       <CardHeader className="pb-4">
-        <CardTitle className="text-white text-xl text-center">Drum Machine</CardTitle>
+        <CardTitle className="text-white text-xl text-center">MIDI DRUM KITS</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex flex-col lg:flex-row gap-6">
