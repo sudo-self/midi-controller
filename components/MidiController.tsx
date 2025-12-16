@@ -349,51 +349,52 @@ const MidiController: React.FC = () => {
                   )}
                 </div>
 
-                {/* Control Knobs - Vertical Layout */}
-                <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <ControlKnob
-                      label="VOLUME"
-                      value={audioSettings.volume}
-                      min={0}
-                      max={1}
-                      onChange={(value) => updateAudioSetting("volume", value)}
-                    />
-                    <ControlKnob
-                      label="FILTER"
-                      value={audioSettings.filterFreq}
-                      min={100}
-                      max={8000}
-                      onChange={(value) => updateAudioSetting("filterFreq", value)}
-                      unit="Hz"
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <ControlKnob
-                      label="ATTACK"
-                      value={audioSettings.attack}
-                      min={0.01}
-                      max={1}
-                      onChange={(value) => updateAudioSetting("attack", value)}
-                      unit="s"
-                    />
-                    <ControlKnob
-                      label="RELEASE"
-                      value={audioSettings.release}
-                      min={0.01}
-                      max={3}
-                      onChange={(value) => updateAudioSetting("release", value)}
-                      unit="s"
-                    />
-                  </div>
-                  <ControlKnob
-                    label="REVERB"
-                    value={audioSettings.reverb}
-                    min={0}
-                    max={1}
-                    onChange={(value) => updateAudioSetting("reverb", value)}
-                  />
-                </div>
+                // In MidiController.tsx, in the Synthesizer Controls section:
+{/* Control Knobs - More compact layout */}
+<div className="space-y-4">
+  <div className="grid grid-cols-2 gap-3">
+    <ControlKnob
+      label="VOLUME"
+      value={audioSettings.volume}
+      min={0}
+      max={1}
+      onChange={(value) => updateAudioSetting("volume", value)}
+    />
+    <ControlKnob
+      label="FILTER"
+      value={audioSettings.filterFreq}
+      min={100}
+      max={8000}
+      onChange={(value) => updateAudioSetting("filterFreq", value)}
+      unit="Hz"
+    />
+    <ControlKnob
+      label="ATTACK"
+      value={audioSettings.attack}
+      min={0.01}
+      max={1}
+      onChange={(value) => updateAudioSetting("attack", value)}
+      unit="s"
+    />
+    <ControlKnob
+      label="RELEASE"
+      value={audioSettings.release}
+      min={0.01}
+      max={3}
+      onChange={(value) => updateAudioSetting("release", value)}
+      unit="s"
+    />
+  </div>
+  <div className="flex justify-center">
+    <ControlKnob
+      label="REVERB"
+      value={audioSettings.reverb}
+      min={0}
+      max={1}
+      onChange={(value) => updateAudioSetting("reverb", value)}
+    />
+  </div>
+</div>
 
                 {/* Control Buttons */}
                 <div className="space-y-3">
