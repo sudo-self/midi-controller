@@ -1,3 +1,4 @@
+// web-midi-music.vercel.app
 "use client"
 
 import type React from "react"
@@ -253,7 +254,7 @@ const MidiController: React.FC = () => {
           <div className="relative">
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-indigo-500/20 to-transparent blur-xl"></div>
             <h1 className="relative text-4xl md:text-5xl font-bold bg-gradient-to-r from-indigo-400 via-cyan-400 to-purple-400 bg-clip-text text-transparent mb-2">
-              WEB MIDI MUSIC
+              Web Midi Music
             </h1>
           </div>
           <div className="flex items-center justify-center gap-3 text-zinc-300">
@@ -262,7 +263,7 @@ const MidiController: React.FC = () => {
               <span className="text-sm">LIVE</span>
             </div>
             <span className="text-sm">•</span>
-            <p className="text-sm">SYNTHESIZER • PIANO • DRUM MACHINES</p>
+            <p className="text-sm">SYNTHESIZER • PIANO • DRUM KITs • MP3 Player </p>
             <span className="text-sm">•</span>
             <div className="flex items-center gap-1">
               <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
@@ -446,25 +447,24 @@ const MidiController: React.FC = () => {
               <DrumMachine audioContext={audioContext} masterGain={masterGainRef.current} />
             </div>
 
-              {/* Piano container - Now responsive */}
-              <div className="flex-1 overflow-x-auto">
-                <div className="relative min-w-[700px]">
-                  <div className="absolute -inset-1 bg-gradient-to-r from-purple-500/10 to-pink-500/10 blur-lg rounded-xl"></div>
-                  <Card className="bg-gradient-to-br from-zinc-900/95 to-black border-zinc-800 backdrop-blur-sm">
-                    <CardHeader className="pb-4 border-b border-zinc-800">
-                      <CardTitle className="text-white text-xl flex items-center gap-2">
-                        <div className="w-3 h-3 bg-purple-500 rounded-full animate-pulse"></div>
-                        PIANO KEYBOARD
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="py-6">
-                      <div className="flex justify-center">
-                        <Piano onNotePlay={playNote} onNoteStop={stopNote} />
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              </div>
+            {/* Piano container - Now responsive */}
+            <div className="relative">
+              <div className="absolute -inset-1 bg-gradient-to-r from-purple-500/10 to-pink-500/10 blur-lg rounded-xl"></div>
+              <Card className="bg-gradient-to-br from-zinc-900/95 to-black border-zinc-800 backdrop-blur-sm">
+                <CardHeader className="pb-4 border-b border-zinc-800">
+                  <CardTitle className="text-white text-xl flex items-center gap-2">
+                    <div className="w-3 h-3 bg-purple-500 rounded-full animate-pulse"></div>
+                    PIANO KEYBOARD
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="py-6">
+                  <div className="overflow-x-auto">
+                    <div className="min-w-[700px] flex justify-center">
+                      <Piano onNotePlay={playNote} onNoteStop={stopNote} />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </div>
@@ -578,7 +578,7 @@ const MidiController: React.FC = () => {
               </a>
               <div className="text-zinc-600 text-sm">•</div>
               <div className="text-zinc-400 text-sm">
-                <span className="text-cyan-400">♫♪</span> JRs Web MIDI Controller <span className="text-cyan-400">♫♪</span>
+                <span className="text-cyan-400">♫♪</span>JRs web-midi-music<span className="text-cyan-400">♫♪</span>
               </div>
             </div>
           </div>
