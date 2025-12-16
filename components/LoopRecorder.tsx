@@ -10,23 +10,23 @@ interface LoopRecorderProps {
   masterGain: GainNode | null
 }
 
-// Define some sample tracks (you can replace these with your own)
+
 const SAMPLE_TRACKS = [
   {
     id: 1,
-    title: "Ambient Chill",
-    artist: "JR's Studio",
+    title: "Make it Right",
+    artist: "Van Buuren",
     duration: 120, // 2 minutes
-    url: "https://assets.mixkit.co/music/preview/mixkit-tech-house-vibes-130.mp3",
+    url: "https://github.com/sudo-self/edm.JesseJesse.com/blob/151b86c6a43c688b4a7f690c0a4eedc4dc826507/MixTape/03.%20MAKE%20IT%20RIGHT%20Armin%20Van%20Buuren.mp3",
     color: "from-blue-600 to-indigo-600",
     isSample: true
   },
   {
     id: 2,
-    title: "Synth Waves",
-    artist: "Web MIDI",
+    title: "Sample",
+    artist: "LOFTICRIES",
     duration: 90, // 1.5 minutes
-    url: "https://assets.mixkit.co/music/preview/mixkit-driving-ambition-32.mp3",
+    url: "https://github.com/sudo-self/edm.JesseJesse.com/blob/151b86c6a43c688b4a7f690c0a4eedc4dc826507/MixTape/02.%20LOFTICRIES.mp3",
     color: "from-purple-600 to-pink-600",
     isSample: true
   }
@@ -446,7 +446,7 @@ const LoopRecorder: React.FC<LoopRecorderProps> = ({ audioContext, masterGain })
       <CardHeader className="pb-4 border-b border-zinc-800">
         <CardTitle className="text-white text-xl flex items-center gap-2">
           <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-          LOOP RECORDER & MP3 PLAYER
+          MP3 PlAYER
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-6">
