@@ -446,32 +446,7 @@ const MidiController: React.FC = () => {
               <DrumMachine audioContext={audioContext} masterGain={masterGainRef.current} />
             </div>
 
-            {/* Storm Visualization Iframe - Added right above the piano */}
-            <div className="relative">
-              <div className="absolute -inset-1 bg-gradient-to-r from-purple-500/10 to-pink-500/10 blur-lg rounded-xl"></div>
-              <Card className="bg-gradient-to-br from-zinc-900/95 to-black border-zinc-800 backdrop-blur-sm">
-                <CardHeader className="pb-4 border-b border-zinc-800">
-                  <CardTitle className="text-white text-xl flex items-center gap-2">
-                    <div className="w-3 h-3 bg-purple-500 rounded-full animate-pulse"></div>
-                    STORM VISUALIZER
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="py-4 flex justify-center">
-                  <iframe 
-                    src="https://storm.jessejesse.com/" 
-                    width="300" 
-                    height="300"
-                    className="rounded-lg border-2 border-purple-800/50 shadow-lg shadow-purple-500/20"
-                    style={{ minWidth: '300px', minHeight: '300px' }}
-                    title="Storm Visualizer"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  />
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Piano */}
+            {/* Piano with inline iframe */}
             <div className="relative">
               <div className="absolute -inset-1 bg-gradient-to-r from-purple-500/10 to-pink-500/10 blur-lg rounded-xl"></div>
               <Card className="bg-gradient-to-br from-zinc-900/95 to-black border-zinc-800 backdrop-blur-sm">
@@ -481,8 +456,26 @@ const MidiController: React.FC = () => {
                     PIANO KEYBOARD
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="flex justify-center py-6">
-                  <Piano onNotePlay={playNote} onNoteStop={stopNote} />
+                <CardContent className="py-6">
+                  <div className="flex flex-col md:flex-row gap-4">
+                    {/* Small iframe beside piano */}
+                    <div className="md:w-1/4 flex justify-center md:justify-start">
+                      <iframe 
+                        src="https://storm.jessejesse.com/" 
+                        width="200" 
+                        height="150"
+                        className="rounded-lg border-0 shadow-lg shadow-purple-500/20 w-[200px] h-[150px]"
+                        title="Storm Visualizer"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                    </div>
+                    
+                    {/* Piano takes remaining space */}
+                    <div className="md:w-3/4">
+                      <Piano onNotePlay={playNote} onNoteStop={stopNote} />
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             </div>
