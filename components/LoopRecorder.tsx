@@ -14,19 +14,19 @@ interface LoopRecorderProps {
 const SAMPLE_TRACKS = [
   {
     id: 1,
-    title: "Make it Right",
-    artist: "Van Buuren",
+    title: "KING OF EVERYTHING",
+    artist: "Wiz K.",
     duration: 120, // 2 minutes
-    url: "https://github.com/sudo-self/edm.JesseJesse.com/blob/151b86c6a43c688b4a7f690c0a4eedc4dc826507/MixTape/03.%20MAKE%20IT%20RIGHT%20Armin%20Van%20Buuren.mp3",
+    url: "https://github.com/sudo-self/mp3-web/blob/4e59b2d5673c433d18edfc2522c7279fa3b97192/Wiz%20Khalifa%20-%20King%20of%20Everything%20%5BOfficial%20Video%5D%20%5B8d0cm_hcQes%5D.mp3",
     color: "from-blue-600 to-indigo-600",
     isSample: true
   },
   {
     id: 2,
-    title: "Sample",
-    artist: "LOFTICRIES",
+    title: "ENEMIES",
+    artist: "Azi Azi Gibson",
     duration: 90, // 1.5 minutes
-    url: "https://github.com/sudo-self/edm.JesseJesse.com/blob/151b86c6a43c688b4a7f690c0a4eedc4dc826507/MixTape/02.%20LOFTICRIES.mp3",
+    url: "https://github.com/sudo-self/mp3-web/blob/4e59b2d5673c433d18edfc2522c7279fa3b97192/Azizi%20Gibson%20-%20Enemies%20(Prod.%20KAMANDI)%20%5BvUkMSXteHNY%5D.mp3",
     color: "from-purple-600 to-pink-600",
     isSample: true
   }
