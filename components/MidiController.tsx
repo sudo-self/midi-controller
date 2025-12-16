@@ -673,7 +673,7 @@ const MidiController: React.FC = () => {
               <CardHeader className="pb-4 border-b border-zinc-800">
                 <CardTitle className="text-white text-xl flex items-center gap-2">
                   <div className="w-3 h-3 bg-amber-500 rounded-full"></div>
-                  WEB ＼（〇_ｏ）／ MIDI
+                  What Da ＼（〇_ｏ）／ Fuk ...
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-6">
