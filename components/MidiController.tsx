@@ -304,19 +304,18 @@ const MidiController: React.FC = () => {
               Web Midi Music
             </h1>
           </div>
-          <div className="flex items-center justify-center gap-3 text-zinc-300">
-            <div className="flex items-center gap-1">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-              <span className="text-sm">•</span>
-            </div>
-            <p className="text-sm">web-midi-music.vercel.app</p>
-            <span className="text-sm">•</span>
-            <div className="flex items-center gap-1">
-              <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
-              <span className="text-sm">REC</span>
-            </div>
-          </div>
-        </div>
+          
+   <div className="flex items-center justify-center gap-3 text-zinc-300">
+  {/* URL */}
+  <p className="text-sm text-pink-500">web-midi-music.vercel.app</p>
+
+  {/* Recording Indicator */}
+  <div className="flex items-center gap-1">
+    <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+    <span className="text-sm">REC</span>
+  </div>
+</div>
+
 
         {/* Visual Feedback Status Bar */}
         <div className="bg-zinc-900/50 backdrop-blur-sm rounded-xl p-3 border border-zinc-800">
