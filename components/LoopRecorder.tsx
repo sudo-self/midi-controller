@@ -59,6 +59,11 @@ const LoopRecorder: React.FC<LoopRecorderProps> = ({ audioContext, masterGain })
   const [uploadedTracks, setUploadedTracks] = useState<UploadedTrack[]>([])
   const [isUploading, setIsUploading] = useState(false)
   
+  // Crossfader state
+  const [crossfaderValue, setCrossfaderValue] = useState(0.5)
+  const [crossfaderGainA, setCrossfaderGainA] = useState(1)
+  const [crossfaderGainB, setCrossfaderGainB] = useState(1)
+  
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const recordedChunksRef = useRef<Blob[]>([])
   const sourceNodeRef = useRef<AudioBufferSourceNode | null>(null)
@@ -69,6 +74,10 @@ const LoopRecorder: React.FC<LoopRecorderProps> = ({ audioContext, masterGain })
   const audioRef = useRef<HTMLAudioElement>(null)
   const progressIntervalRef = useRef<number | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  
+  // Crossfader refs
+  const crossfaderRef = useRef<HTMLDivElement>(null)
+  const isDraggingRef = useRef(false)
 
   // Load first track on mount
   useEffect(() => {
@@ -123,6 +132,30 @@ const LoopRecorder: React.FC<LoopRecorderProps> = ({ audioContext, masterGain })
       })
     }
   }, [uploadedTracks])
+
+  // Update crossfader gains when value changes
+  useEffect(() => {
+    // Calculate gains using curve function for smooth transitions
+    const value = crossfaderValue
+    
+    // Using equal power curve for smooth crossfade
+    const gainA = value <= 0.5 ? 1 : Math.cos((value - 0.5) * Math.PI)
+    const gainB = value >= 0.5 ? 1 : Math.cos((0.5 - value) * Math.PI)
+    
+    setCrossfaderGainA(gainA)
+    setCrossfaderGainB(gainB)
+    
+    // Apply gains to audio if playing (you would connect this to your audio routing)
+    if (audioRef.current) {
+      audioRef.current.volume = volume * gainB // Assuming MP3 is on channel B
+    }
+    
+    // Apply gain to loop if playing (assuming loop is on channel A)
+    if (sourceNodeRef.current && masterGain) {
+      // In a real implementation, you would have separate gain nodes for A/B channels
+      // This is a simplified version
+    }
+  }, [crossfaderValue, volume])
 
   // MP3 Player functions
   const getAllTracks = (): AllTracks[] => {
@@ -227,8 +260,61 @@ const LoopRecorder: React.FC<LoopRecorderProps> = ({ audioContext, masterGain })
   const updateVolume = (newVolume: number) => {
     setVolume(newVolume)
     if (audioRef.current) {
-      audioRef.current.volume = newVolume
+      audioRef.current.volume = newVolume * crossfaderGainB
     }
+  }
+
+  // Crossfader functions
+  const handleCrossfaderMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault()
+    isDraggingRef.current = true
+    document.addEventListener('mousemove', handleCrossfaderMouseMove)
+    document.addEventListener('mouseup', handleCrossfaderMouseUp)
+    updateCrossfader(e.clientX)
+  }
+
+  const handleCrossfaderTouchStart = (e: React.TouchEvent) => {
+    isDraggingRef.current = true
+    document.addEventListener('touchmove', handleCrossfaderTouchMove, { passive: false })
+    document.addEventListener('touchend', handleCrossfaderTouchEnd)
+    updateCrossfader(e.touches[0].clientX)
+  }
+
+  const handleCrossfaderMouseMove = (e: MouseEvent) => {
+    if (!isDraggingRef.current) return
+    updateCrossfader(e.clientX)
+  }
+
+  const handleCrossfaderTouchMove = (e: TouchEvent) => {
+    if (!isDraggingRef.current) return
+    e.preventDefault()
+    updateCrossfader(e.touches[0].clientX)
+  }
+
+  const handleCrossfaderMouseUp = () => {
+    isDraggingRef.current = false
+    document.removeEventListener('mousemove', handleCrossfaderMouseMove)
+    document.removeEventListener('mouseup', handleCrossfaderMouseUp)
+  }
+
+  const handleCrossfaderTouchEnd = () => {
+    isDraggingRef.current = false
+    document.removeEventListener('touchmove', handleCrossfaderTouchMove)
+    document.removeEventListener('touchend', handleCrossfaderTouchEnd)
+  }
+
+  const updateCrossfader = (clientX: number) => {
+    if (!crossfaderRef.current) return
+    
+    const rect = crossfaderRef.current.getBoundingClientRect()
+    const x = clientX - rect.left
+    const percentage = Math.max(0, Math.min(1, x / rect.width))
+    
+    setCrossfaderValue(percentage)
+  }
+
+  const resetCrossfader = () => {
+    setCrossfaderValue(0.5)
   }
 
   // File upload functions
@@ -531,6 +617,90 @@ const LoopRecorder: React.FC<LoopRecorderProps> = ({ audioContext, masterGain })
                 Record up to 10 seconds of audio and play it back in a continuous loop. 
                 Mix with the piano or drum machine while playing.
               </p>
+            </div>
+
+            {/* DJ Crossfader - Added to bottom left space */}
+            <div className="pt-4 mt-4 border-t border-zinc-800/50">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-zinc-300 text-sm font-medium">DJ CROSSFADER</span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={resetCrossfader}
+                  className="text-xs h-6 px-2 text-zinc-400 hover:text-white"
+                >
+                  Center
+                </Button>
+              </div>
+              
+              <div className="relative">
+                <div className="flex justify-between text-xs text-zinc-400 mb-1">
+                  <span>A (Loop)</span>
+                  <span>B (MP3)</span>
+                </div>
+                
+                {/* Crossfader track */}
+                <div 
+                  ref={crossfaderRef}
+                  className="relative h-10 bg-gradient-to-r from-blue-900/30 via-purple-900/30 to-pink-900/30 rounded-lg border border-zinc-700/50 cursor-pointer"
+                  onMouseDown={handleCrossfaderMouseDown}
+                  onTouchStart={handleCrossfaderTouchStart}
+                >
+                  {/* Center line */}
+                  <div className="absolute top-0 left-1/2 w-px h-full bg-zinc-700/50"></div>
+                  
+                  {/* Active zones */}
+                  <div 
+                    className="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-600/20 to-transparent transition-all duration-100"
+                    style={{ width: `${crossfaderValue * 100}%` }}
+                  />
+                  <div 
+                    className="absolute top-0 right-0 h-full bg-gradient-to-l from-pink-600/20 to-transparent transition-all duration-100"
+                    style={{ width: `${(1 - crossfaderValue) * 100}%` }}
+                  />
+                  
+                  {/* DJ Paddle */}
+                  <div 
+                    className="absolute top-1/2 w-10 h-16 -mt-8 -ml-5 flex flex-col items-center justify-center transition-all duration-100"
+                    style={{ left: `${crossfaderValue * 100}%` }}
+                  >
+                    {/* Paddle handle */}
+                    <div className="w-6 h-16 bg-gradient-to-b from-zinc-800 to-zinc-900 rounded-t-lg border border-zinc-700/50 shadow-lg flex flex-col items-center justify-center">
+                      {/* Grip lines */}
+                      <div className="w-3 h-0.5 bg-zinc-600 mb-1"></div>
+                      <div className="w-3 h-0.5 bg-zinc-600 mb-1"></div>
+                      <div className="w-3 h-0.5 bg-zinc-600"></div>
+                    </div>
+                    
+                    {/* Paddle base */}
+                    <div className="w-10 h-2 bg-gradient-to-r from-blue-600 to-pink-600 rounded-b-lg shadow-lg"></div>
+                    
+                    {/* Position indicator */}
+                    <div className="absolute -bottom-6 text-xs text-zinc-300 font-mono">
+                      {Math.round(crossfaderValue * 100)}%
+                    </div>
+                  </div>
+                  
+                  {/* Gain indicators */}
+                  <div className="absolute top-1 left-2 text-xs text-blue-300 font-mono">
+                    {Math.round(crossfaderGainA * 100)}%
+                  </div>
+                  <div className="absolute top-1 right-2 text-xs text-pink-300 font-mono">
+                    {Math.round(crossfaderGainB * 100)}%
+                  </div>
+                </div>
+                
+                <div className="flex justify-between mt-2 text-xs text-zinc-500">
+                  <div className="flex items-center gap-1">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                    <span>Channel A: Loop</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <div className="w-2 h-2 bg-pink-500 rounded-full"></div>
+                    <span>Channel B: MP3</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
