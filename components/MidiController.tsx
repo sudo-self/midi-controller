@@ -307,9 +307,8 @@ const MidiController: React.FC = () => {
           <div className="flex items-center justify-center gap-3 text-zinc-300">
             <div className="flex items-center gap-1">
               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-              <span className="text-sm">JRs</span>
+              <span className="text-sm">•</span>
             </div>
-            <span className="text-sm">•</span>
             <p className="text-sm">web-midi-music.vercel.app</p>
             <span className="text-sm">•</span>
             <div className="flex items-center gap-1">
