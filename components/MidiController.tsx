@@ -246,8 +246,8 @@ const MidiController: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-black via-zinc-950 to-black p-3 md:p-5">
-      <div className="max-w-7xl mx-auto space-y-5">
+    <div className="min-h-screen bg-gradient-to-b from-black via-zinc-950 to-black p-4 md:p-6 overflow-x-hidden">
+      <div className="max-w-[1400px] mx-auto space-y-6">
         {/* Header with DJ-style branding */}
         <div className="text-center space-y-2">
           <div className="relative">
@@ -272,9 +272,9 @@ const MidiController: React.FC = () => {
         </div>
 
         {/* Main Control Deck - Split Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column - Synthesizer Controls */}
-          <div className="lg:col-span-1 space-y-5">
+          <div className="lg:col-span-1 space-y-6">
             <Card className="bg-gradient-to-br from-zinc-900/95 to-black border-zinc-800 backdrop-blur-sm">
               <CardHeader className="pb-4 border-b border-zinc-800">
                 <CardTitle className="text-white text-xl flex items-center gap-2">
@@ -349,52 +349,51 @@ const MidiController: React.FC = () => {
                   )}
                 </div>
 
-                // In MidiController.tsx, in the Synthesizer Controls section:
-{/* Control Knobs - More compact layout */}
-<div className="space-y-4">
-  <div className="grid grid-cols-2 gap-3">
-    <ControlKnob
-      label="VOLUME"
-      value={audioSettings.volume}
-      min={0}
-      max={1}
-      onChange={(value) => updateAudioSetting("volume", value)}
-    />
-    <ControlKnob
-      label="FILTER"
-      value={audioSettings.filterFreq}
-      min={100}
-      max={8000}
-      onChange={(value) => updateAudioSetting("filterFreq", value)}
-      unit="Hz"
-    />
-    <ControlKnob
-      label="ATTACK"
-      value={audioSettings.attack}
-      min={0.01}
-      max={1}
-      onChange={(value) => updateAudioSetting("attack", value)}
-      unit="s"
-    />
-    <ControlKnob
-      label="RELEASE"
-      value={audioSettings.release}
-      min={0.01}
-      max={3}
-      onChange={(value) => updateAudioSetting("release", value)}
-      unit="s"
-    />
-  </div>
-  <div className="flex justify-center">
-    <ControlKnob
-      label="REVERB"
-      value={audioSettings.reverb}
-      min={0}
-      max={1}
-      onChange={(value) => updateAudioSetting("reverb", value)}
-    />
-  </div>
-</div>
+                {/* Control Knobs - More compact layout */}
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-3">
+                    <ControlKnob
+                      label="VOLUME"
+                      value={audioSettings.volume}
+                      min={0}
+                      max={1}
+                      onChange={(value) => updateAudioSetting("volume", value)}
+                    />
+                    <ControlKnob
+                      label="FILTER"
+                      value={audioSettings.filterFreq}
+                      min={100}
+                      max={8000}
+                      onChange={(value) => updateAudioSetting("filterFreq", value)}
+                      unit="Hz"
+                    />
+                    <ControlKnob
+                      label="ATTACK"
+                      value={audioSettings.attack}
+                      min={0.01}
+                      max={1}
+                      onChange={(value) => updateAudioSetting("attack", value)}
+                      unit="s"
+                    />
+                    <ControlKnob
+                      label="RELEASE"
+                      value={audioSettings.release}
+                      min={0.01}
+                      max={3}
+                      onChange={(value) => updateAudioSetting("release", value)}
+                      unit="s"
+                    />
+                  </div>
+                  <div className="flex justify-center">
+                    <ControlKnob
+                      label="REVERB"
+                      value={audioSettings.reverb}
+                      min={0}
+                      max={1}
+                      onChange={(value) => updateAudioSetting("reverb", value)}
+                    />
+                  </div>
+                </div>
 
                 {/* Control Buttons */}
                 <div className="space-y-3">
@@ -439,56 +438,55 @@ const MidiController: React.FC = () => {
             </Card>
           </div>
 
-// In MidiController.tsx, update the Center Column - Main Instruments section:
-
-{/* Center Column - Main Instruments */}
-<div className="lg:col-span-2 space-y-5">
-  {/* Drum Machine */}
-  <div className="relative">
-    <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500/10 to-cyan-500/10 blur-lg rounded-xl"></div>
-    <DrumMachine audioContext={audioContext} masterGain={masterGainRef.current} />
-  </div>
-
-  {/* Piano Area - Responsive layout */}
-  <div className="flex flex-col md:flex-row gap-4 items-start">
-    {/* Storm visualizer iframe */}
-    <div className="md:w-24 md:mt-4">
-      <iframe 
-        src="https://storm.jessejesse.com/" 
-        width="96" 
-        height="96"
-        className="border-0 rounded-lg"
-        title="Storm Visualizer"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowFullScreen
-      />
-    </div>
-
-    {/* Piano container - Now responsive */}
-    <div className="flex-1 overflow-x-auto">
-      <div className="relative min-w-[700px]"> {/* Minimum width for piano */}
-        <div className="absolute -inset-1 bg-gradient-to-r from-purple-500/10 to-pink-500/10 blur-lg rounded-xl"></div>
-        <Card className="bg-gradient-to-br from-zinc-900/95 to-black border-zinc-800 backdrop-blur-sm">
-          <CardHeader className="pb-4 border-b border-zinc-800">
-            <CardTitle className="text-white text-xl flex items-center gap-2">
-              <div className="w-3 h-3 bg-purple-500 rounded-full animate-pulse"></div>
-              PIANO KEYBOARD
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="py-6">
-            <div className="flex justify-center">
-              <Piano onNotePlay={playNote} onNoteStop={stopNote} />
+          {/* Center Column - Main Instruments */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Drum Machine */}
+            <div className="relative">
+              <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500/10 to-cyan-500/10 blur-lg rounded-xl"></div>
+              <DrumMachine audioContext={audioContext} masterGain={masterGainRef.current} />
             </div>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
-  </div>
-</div>
+
+            {/* Piano Area - Responsive layout */}
+            <div className="flex flex-col md:flex-row gap-4 items-start">
+              {/* Storm visualizer iframe */}
+              <div className="md:w-24 md:mt-4">
+                <iframe 
+                  src="https://storm.jessejesse.com/" 
+                  width="96" 
+                  height="96"
+                  className="border-0 rounded-lg"
+                  title="Storm Visualizer"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              </div>
+
+              {/* Piano container - Now responsive */}
+              <div className="flex-1 overflow-x-auto">
+                <div className="relative min-w-[700px]">
+                  <div className="absolute -inset-1 bg-gradient-to-r from-purple-500/10 to-pink-500/10 blur-lg rounded-xl"></div>
+                  <Card className="bg-gradient-to-br from-zinc-900/95 to-black border-zinc-800 backdrop-blur-sm">
+                    <CardHeader className="pb-4 border-b border-zinc-800">
+                      <CardTitle className="text-white text-xl flex items-center gap-2">
+                        <div className="w-3 h-3 bg-purple-500 rounded-full animate-pulse"></div>
+                        PIANO KEYBOARD
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="py-6">
+                      <div className="flex justify-center">
+                        <Piano onNotePlay={playNote} onNoteStop={stopNote} />
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
         {/* Bottom Row - Loop Recorder and Instructions */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-          {/* Loop Recorder - Now with MP3 Player on right side */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Loop Recorder */}
           <div className="lg:col-span-2">
             <LoopRecorder audioContext={audioContext} masterGain={masterGainRef.current} />
           </div>
@@ -505,7 +503,7 @@ const MidiController: React.FC = () => {
               <CardContent className="pt-6">
                 <div className="space-y-4">
                   <div className="space-y-3">
-                    <h4 className="text-white font-semibold text-sm">KEYBOARD MAPPING</h4>
+                    <h4 className="text-white font-semibold text-sm">KEY MAPs</h4>
                     <div className="grid grid-cols-2 gap-3">
                       <div className="bg-zinc-800/50 p-3 rounded-lg">
                         <div className="text-cyan-300 text-xs font-semibold mb-1">OCTAVE 1</div>
@@ -525,7 +523,7 @@ const MidiController: React.FC = () => {
                   </div>
 
                   <div className="bg-gradient-to-r from-amber-900/20 to-yellow-900/20 p-3 rounded-lg border border-amber-800/30">
-                    <h4 className="text-amber-300 font-semibold text-sm mb-2">QUICK TIPS</h4>
+                    <h4 className="text-amber-300 font-semibold text-sm mb-2">web-midi-music.vercel.app</h4>
                     <ul className="text-zinc-300 text-xs space-y-1">
                       <li className="flex items-start gap-2">
                         <span className="text-amber-400">▶</span>
@@ -579,7 +577,7 @@ const MidiController: React.FC = () => {
         <div className="text-center py-4 border-t border-zinc-800/50">
           <div className="flex flex-col md:flex-row items-center justify-between gap-3">
             <p className="text-zinc-500 text-sm">
-              WEB MIDI MUSIC v1.0 • Built with Web Audio API
+              WEB MIDI MUSIC • HQ Web Audio API
             </p>
             <div className="flex items-center gap-4">
               <a
