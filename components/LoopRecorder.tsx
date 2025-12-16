@@ -642,12 +642,44 @@ const LoopRecorder: React.FC<LoopRecorderProps> = ({ audioContext, masterGain })
                 {/* Crossfader track */}
                 <div 
                   ref={crossfaderRef}
-                  className="relative h-10 bg-gradient-to-r from-blue-900/30 via-purple-900/30 to-pink-900/30 rounded-lg border border-zinc-700/50 cursor-pointer"
+                  className="relative h-10 bg-gradient-to-r from-blue-900/30 via-purple-900/30 to-pink-900/30 rounded-lg border border-zinc-700/50 cursor-pointer overflow-hidden"
                   onMouseDown={handleCrossfaderMouseDown}
                   onTouchStart={handleCrossfaderTouchStart}
                 >
-                  {/* Center line */}
-                  <div className="absolute top-0 left-1/2 w-px h-full bg-zinc-700/50"></div>
+                  {/* White vertical lines for UI aesthetics */}
+                  <div className="absolute top-0 left-0 w-full h-full flex justify-between items-center px-2">
+                    {/* Left side lines - spaced evenly */}
+                    <div className="h-4 w-px bg-white/20"></div>
+                    <div className="h-4 w-px bg-white/20"></div>
+                    <div className="h-4 w-px bg-white/20"></div>
+                    <div className="h-4 w-px bg-white/20"></div>
+                    <div className="h-4 w-px bg-white/20"></div>
+                    
+                    {/* Center line - thicker and brighter */}
+                    <div className="h-6 w-0.5 bg-white/30"></div>
+                    
+                    {/* Right side lines - spaced evenly */}
+                    <div className="h-4 w-px bg-white/20"></div>
+                    <div className="h-4 w-px bg-white/20"></div>
+                    <div className="h-4 w-px bg-white/20"></div>
+                    <div className="h-4 w-px bg-white/20"></div>
+                    <div className="h-4 w-px bg-white/20"></div>
+                  </div>
+                  
+                  {/* Additional decorative lines pattern */}
+                  <div className="absolute top-0 left-0 w-full h-full flex justify-between px-4">
+                    {/* Top small lines */}
+                    <div className="h-2 w-px bg-white/10 mt-1"></div>
+                    <div className="h-2 w-px bg-white/10 mt-1"></div>
+                    <div className="h-2 w-px bg-white/10 mt-1"></div>
+                    <div className="h-2 w-px bg-white/10 mt-1"></div>
+                    
+                    {/* Bottom small lines */}
+                    <div className="h-2 w-px bg-white/10 mb-1 self-end"></div>
+                    <div className="h-2 w-px bg-white/10 mb-1 self-end"></div>
+                    <div className="h-2 w-px bg-white/10 mb-1 self-end"></div>
+                    <div className="h-2 w-px bg-white/10 mb-1 self-end"></div>
+                  </div>
                   
                   {/* Active zones */}
                   <div 
@@ -661,7 +693,7 @@ const LoopRecorder: React.FC<LoopRecorderProps> = ({ audioContext, masterGain })
                   
                   {/* DJ Paddle */}
                   <div 
-                    className="absolute top-1/2 w-10 h-16 -mt-8 -ml-5 flex flex-col items-center justify-center transition-all duration-100"
+                    className="absolute top-1/2 w-10 h-16 -mt-8 -ml-5 flex flex-col items-center justify-center transition-all duration-100 z-10"
                     style={{ left: `${crossfaderValue * 100}%` }}
                   >
                     {/* Paddle handle */}
@@ -682,10 +714,10 @@ const LoopRecorder: React.FC<LoopRecorderProps> = ({ audioContext, masterGain })
                   </div>
                   
                   {/* Gain indicators */}
-                  <div className="absolute top-1 left-2 text-xs text-blue-300 font-mono">
+                  <div className="absolute top-1 left-2 text-xs text-blue-300 font-mono z-10">
                     {Math.round(crossfaderGainA * 100)}%
                   </div>
-                  <div className="absolute top-1 right-2 text-xs text-pink-300 font-mono">
+                  <div className="absolute top-1 right-2 text-xs text-pink-300 font-mono z-10">
                     {Math.round(crossfaderGainB * 100)}%
                   </div>
                 </div>
