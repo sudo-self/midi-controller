@@ -438,49 +438,52 @@ const MidiController: React.FC = () => {
             </Card>
           </div>
 
-          {/* Center Column - Main Instruments */}
-          <div className="lg:col-span-2 space-y-5">
-            {/* Drum Machine */}
-            <div className="relative">
-              <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500/10 to-cyan-500/10 blur-lg rounded-xl"></div>
-              <DrumMachine audioContext={audioContext} masterGain={masterGainRef.current} />
-            </div>
+// In MidiController.tsx, update the Center Column - Main Instruments section:
 
-            {/* Piano Area - Iframe and Piano side by side */}
-            <div className="flex flex-col md:flex-row gap-4 items-start">
-              {/* Small iframe - separate from piano container */}
-              <div className="md:w-24 md:mt-4">
-                <iframe 
-                  src="https://storm.jessejesse.com/" 
-                  width="96" 
-                  height="96"
-                  className="border-0 rounded-lg"
-                  title="Storm Visualizer"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                />
-              </div>
+{/* Center Column - Main Instruments */}
+<div className="lg:col-span-2 space-y-5">
+  {/* Drum Machine */}
+  <div className="relative">
+    <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500/10 to-cyan-500/10 blur-lg rounded-xl"></div>
+    <DrumMachine audioContext={audioContext} masterGain={masterGainRef.current} />
+  </div>
 
-              {/* Piano container */}
-              <div className="flex-1">
-                <div className="relative">
-                  <div className="absolute -inset-1 bg-gradient-to-r from-purple-500/10 to-pink-500/10 blur-lg rounded-xl"></div>
-                  <Card className="bg-gradient-to-br from-zinc-900/95 to-black border-zinc-800 backdrop-blur-sm">
-                    <CardHeader className="pb-4 border-b border-zinc-800">
-                      <CardTitle className="text-white text-xl flex items-center gap-2">
-                        <div className="w-3 h-3 bg-purple-500 rounded-full animate-pulse"></div>
-                        PIANO KEYBOARD
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="flex justify-center py-6">
-                      <Piano onNotePlay={playNote} onNoteStop={stopNote} />
-                    </CardContent>
-                  </Card>
-                </div>
-              </div>
+  {/* Piano Area - Responsive layout */}
+  <div className="flex flex-col md:flex-row gap-4 items-start">
+    {/* Storm visualizer iframe */}
+    <div className="md:w-24 md:mt-4">
+      <iframe 
+        src="https://storm.jessejesse.com/" 
+        width="96" 
+        height="96"
+        className="border-0 rounded-lg"
+        title="Storm Visualizer"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+      />
+    </div>
+
+    {/* Piano container - Now responsive */}
+    <div className="flex-1 overflow-x-auto">
+      <div className="relative min-w-[700px]"> {/* Minimum width for piano */}
+        <div className="absolute -inset-1 bg-gradient-to-r from-purple-500/10 to-pink-500/10 blur-lg rounded-xl"></div>
+        <Card className="bg-gradient-to-br from-zinc-900/95 to-black border-zinc-800 backdrop-blur-sm">
+          <CardHeader className="pb-4 border-b border-zinc-800">
+            <CardTitle className="text-white text-xl flex items-center gap-2">
+              <div className="w-3 h-3 bg-purple-500 rounded-full animate-pulse"></div>
+              PIANO KEYBOARD
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="py-6">
+            <div className="flex justify-center">
+              <Piano onNotePlay={playNote} onNoteStop={stopNote} />
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  </div>
+</div>
 
         {/* Bottom Row - Loop Recorder and Instructions */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
