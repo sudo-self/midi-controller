@@ -778,5 +778,6 @@ const MidiController: React.FC = () => {
     </div>
   </div>
 );
+}
 
 
