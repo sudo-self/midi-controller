@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState, useRef, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
@@ -21,8 +20,7 @@ const DrumMachine: React.FC<DrumMachineProps> = ({ audioContext, masterGain }) =
   const [repeatSpeed, setRepeatSpeed] = useState(200) // ms between repeats
   const [lastPlayedSound, setLastPlayedSound] = useState<DrumSound | null>(null)
   
-  const activeNodesRef = useRef<Map<DrumSound, AudioBufferSourceNode>>(new Map())
-  const repeatIntervalRef = useRef<NodeJS.Timeout | null>(null)
+  const repeatIntervalRef = useRef<number | null>(null)
 
   // KIT 1 Sounds (Original)
   const createKick = (ctx: AudioContext, destination: AudioNode) => {
@@ -116,11 +114,7 @@ const DrumMachine: React.FC<DrumMachineProps> = ({ audioContext, masterGain }) =
       gains.push(gain)
     })
 
-    const filter = ctx.createBiquadFilter()
-    filter.type = "highpass"
-    filter.frequency.value = 7000
-
-    return { oscs, gains, filter }
+    return { oscs, gains }
   }
 
   const createTom = (ctx: AudioContext, destination: AudioNode) => {
@@ -514,7 +508,7 @@ const DrumMachine: React.FC<DrumMachineProps> = ({ audioContext, masterGain }) =
   const toggleRepeat = () => {
     if (isRepeating) {
       // Stop repeating
-      if (repeatIntervalRef.current) {
+      if (repeatIntervalRef.current !== null) {
         clearInterval(repeatIntervalRef.current)
         repeatIntervalRef.current = null
       }
@@ -523,7 +517,7 @@ const DrumMachine: React.FC<DrumMachineProps> = ({ audioContext, masterGain }) =
       // Start repeating if there's a last played sound
       if (lastPlayedSound) {
         setIsRepeating(true)
-        repeatIntervalRef.current = setInterval(() => {
+        repeatIntervalRef.current = window.setInterval(() => {
           if (lastPlayedSound) {
             playDrum(lastPlayedSound)
           }
@@ -535,9 +529,9 @@ const DrumMachine: React.FC<DrumMachineProps> = ({ audioContext, masterGain }) =
   const updateRepeatSpeed = (speed: number) => {
     setRepeatSpeed(speed)
     // If currently repeating, restart the interval with new speed
-    if (isRepeating && repeatIntervalRef.current) {
+    if (isRepeating && repeatIntervalRef.current !== null) {
       clearInterval(repeatIntervalRef.current)
-      repeatIntervalRef.current = setInterval(() => {
+      repeatIntervalRef.current = window.setInterval(() => {
         if (lastPlayedSound) {
           playDrum(lastPlayedSound)
         }
@@ -548,7 +542,7 @@ const DrumMachine: React.FC<DrumMachineProps> = ({ audioContext, masterGain }) =
   // Cleanup on unmount
   useEffect(() => {
     return () => {
-      if (repeatIntervalRef.current) {
+      if (repeatIntervalRef.current !== null) {
         clearInterval(repeatIntervalRef.current)
       }
     }
@@ -671,7 +665,7 @@ const DrumMachine: React.FC<DrumMachineProps> = ({ audioContext, masterGain }) =
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Left side - Kit selector */}
           <div className="lg:w-1/3 space-y-6">
-            <div className="bg-zinc-900/95 border-zinc-700 backdrop-blur-sm"">
+            <div className="bg-zinc-900/95 border border-zinc-700 backdrop-blur-sm p-4 rounded-lg">
               <div className="flex flex-col space-y-4">
                 <CustomToggle />
                 
