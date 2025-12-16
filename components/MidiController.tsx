@@ -360,7 +360,7 @@ const MidiController: React.FC = () => {
                     ? "bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.8)]" 
                     : "bg-zinc-700"
                 }`}></div>
-                <span className="text-xs text-zinc-400 font-medium">LOOP</span>
+                <span className="text-xs text-zinc-400 font-medium">LOOPBACK</span>
               </div>
             </div>
             
@@ -380,8 +380,8 @@ const MidiController: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column - Synthesizer Controls */}
           <div className="lg:col-span-1 space-y-6">
-            <Card className="bg-gradient-to-br from-zinc-900/95 to-black border-zinc-800 backdrop-blur-sm">
-              <CardHeader className="pb-4 border-b border-zinc-800">
+            <Card className="bg-black backdrop-blur-sm">
+              <CardHeader className="pb-4 border-b border-pink-800">
                 <CardTitle className="text-white text-xl flex items-center gap-2">
                   <div className={`w-3 h-3 rounded-full transition-all duration-200 ${
                     visualFeedback.synth 
