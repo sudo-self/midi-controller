@@ -48,6 +48,9 @@ const MidiController: React.FC = () => {
 
   const [waveform, setWaveform] = useState<OscillatorType>("sine")
 
+  // Add drum machine ref to control it directly
+  const drumMachineRef = useRef<any>(null)
+
   useEffect(() => {
     initializeAudio()
     return () => {
@@ -134,7 +137,10 @@ const MidiController: React.FC = () => {
   }
 
   const playNote = (frequency: number, note: string) => {
-    if (!audioContext || !masterGainRef.current) return
+    if (!audioContext || !masterGainRef.current) {
+      console.warn("Audio not initialized")
+      return
+    }
 
     // Stop existing note if playing (important for retriggering)
     stopNote(note)
@@ -226,8 +232,12 @@ const MidiController: React.FC = () => {
   }
 
   const startAudio = async () => {
-    if (audioContext && audioContext.state === "suspended") {
-      await audioContext.resume()
+    if (audioContext) {
+      if (audioContext.state === "suspended") {
+        await audioContext.resume()
+      }
+    } else {
+      await initializeAudio()
     }
     setIsPlaying(true)
   }
@@ -235,6 +245,12 @@ const MidiController: React.FC = () => {
   // Add emergency stop function
   const emergencyStop = () => {
     stopAllNotes()
+    
+    // Stop drum machine playback if it exists
+    if (drumMachineRef.current && typeof drumMachineRef.current.stopAllDrums === 'function') {
+      drumMachineRef.current.stopAllDrums()
+    }
+    
     if (masterGainRef.current) {
       masterGainRef.current.gain.setValueAtTime(0, audioContext?.currentTime || 0)
       setTimeout(() => {
@@ -242,6 +258,13 @@ const MidiController: React.FC = () => {
           masterGainRef.current.gain.setValueAtTime(audioSettings.volume, audioContext?.currentTime || 0)
         }
       }, 100)
+    }
+  }
+
+  // Add function to trigger drum machine externally if needed
+  const triggerDrumSound = (soundName: string) => {
+    if (drumMachineRef.current && typeof drumMachineRef.current.playSound === 'function') {
+      drumMachineRef.current.playSound(soundName)
     }
   }
 
@@ -262,7 +285,7 @@ const MidiController: React.FC = () => {
               <span className="text-sm">LIVE</span>
             </div>
             <span className="text-sm">•</span>
-            <p className="text-sm">SYNTHESIZER • PIANO • DRUM KITs • MP3 Player </p>
+            <p className="text-sm">SYNTHESIZER • PIANO • DRUM KIT • LOOP RECORDER • MP3 Player </p>
             <span className="text-sm">•</span>
             <div className="flex items-center gap-1">
               <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
@@ -435,34 +458,64 @@ const MidiController: React.FC = () => {
                   </div>
                 )}
 
-                {/* Pew Pew and FAAAH Buttons - Added at the bottom */}
+                {/* Drum Test Buttons */}
                 <div className="pt-4">
                   <div className="grid grid-cols-2 gap-3">
                     <div className="text-center">
-                      <div className="text-white text-sm font-medium mb-2">Pew Pew</div>
-                      <iframe 
-                        width="110" 
-                        height="200" 
-                        src="https://www.myinstants.com/instant/pew_pew/embed/" 
-                        frameBorder="0" 
-                        scrolling="no"
-                        className="border-0 rounded-lg mx-auto"
-                        title="Pew Pew Sound"
-                      />
+                      <div className="text-white text-sm font-medium mb-2">Test Drum 1</div>
+                      <Button 
+                        onClick={() => triggerDrumSound('kick')}
+                        className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+                        size="sm"
+                      >
+                        KICK
+                      </Button>
                     </div>
                     <div className="text-center">
-                      <div className="text-white text-sm font-medium mb-2">FAAAH</div>
-                      <iframe 
-                        width="110" 
-                        height="200" 
-                        src="https://www.myinstants.com/instant/faaah-63455/embed/" 
-                        frameBorder="0" 
-                        scrolling="no"
-                        className="border-0 rounded-lg mx-auto"
-                        title="FAAAH Sound"
-                      />
+                      <div className="text-white text-sm font-medium mb-2">Test Drum 2</div>
+                      <Button 
+                        onClick={() => triggerDrumSound('snare')}
+                        className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700"
+                        size="sm"
+                      >
+                        SNARE
+                      </Button>
                     </div>
                   </div>
+                  
+                  {/* Pew Pew and FAAAH Buttons */}
+                  <div className="mt-4">
+                    <div className="text-center">
+                      <div className="text-white text-sm font-medium mb-2">Sound Effects</div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="text-center">
+                          <div className="text-white text-sm font-medium mb-2">Pew Pew</div>
+                          <iframe 
+                            width="110" 
+                            height="200" 
+                            src="https://www.myinstants.com/instant/pew_pew/embed/" 
+                            frameBorder="0" 
+                            scrolling="no"
+                            className="border-0 rounded-lg mx-auto"
+                            title="Pew Pew Sound"
+                          />
+                        </div>
+                        <div className="text-center">
+                          <div className="text-white text-sm font-medium mb-2">FAAAH</div>
+                          <iframe 
+                            width="110" 
+                            height="200" 
+                            src="https://www.myinstants.com/instant/faaah-63455/embed/" 
+                            frameBorder="0" 
+                            scrolling="no"
+                            className="border-0 rounded-lg mx-auto"
+                            title="FAAAH Sound"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
                   <div className="text-center mt-2">
                     <p className="text-zinc-400 text-xs">midi instants</p>
                   </div>
@@ -476,10 +529,15 @@ const MidiController: React.FC = () => {
             {/* Drum Machine */}
             <div className="relative">
               <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500/10 to-cyan-500/10 blur-lg rounded-xl"></div>
-              <DrumMachine audioContext={audioContext} masterGain={masterGainRef.current} />
+              <DrumMachine 
+                ref={drumMachineRef}
+                audioContext={audioContext} 
+                masterGain={masterGainRef.current}
+                isAudioActive={isPlaying}
+              />
             </div>
 
-            {/* Piano container - Now responsive */}
+            {/* Piano container */}
             <div className="relative">
               <div className="absolute -inset-1 bg-gradient-to-r from-purple-500/10 to-pink-500/10 blur-lg rounded-xl"></div>
               <Card className="bg-gradient-to-br from-zinc-900/95 to-black border-zinc-800 backdrop-blur-sm">
@@ -548,7 +606,11 @@ const MidiController: React.FC = () => {
                       </li>
                       <li className="flex items-start gap-2">
                         <span className="text-amber-400">▶</span>
-                        <span>Use Drum Machine repeater for patterns</span>
+                        <span>Use Drum Machine for beat patterns</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-amber-400">▶</span>
+                        <span>Click drum pads to play sounds</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <span className="text-amber-400">▶</span>
@@ -556,15 +618,7 @@ const MidiController: React.FC = () => {
                       </li>
                       <li className="flex items-start gap-2">
                         <span className="text-amber-400">▶</span>
-                        <span>Watch the storm visualizer beside piano</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <span className="text-amber-400">▶</span>
                         <span>Record loops with Loop Recorder</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <span className="text-amber-400">▶</span>
-                        <span>Play MP3 tracks for background music</span>
                       </li>
                     </ul>
                   </div>
@@ -594,7 +648,7 @@ const MidiController: React.FC = () => {
         <div className="text-center py-4 border-t border-zinc-800/50">
           <div className="flex flex-col md:flex-row items-center justify-between gap-3">
             <p className="text-zinc-500 text-sm">
-              WEB MIDI MUSIC • HQ Web Audio API
+              WEB MIDI MUSIC • HQ Web Audio API • Drums Fixed
             </p>
             <div className="flex items-center gap-4">
               <a
