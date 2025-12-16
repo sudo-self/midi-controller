@@ -639,7 +639,7 @@ const DrumMachine: React.FC<DrumMachineProps> = ({ audioContext, masterGain }) =
   // Custom Toggle Component
   const CustomToggle = () => (
     <div className="flex items-center justify-between">
-      <div className="text-white font-medium text-lg">web-midi-music</div>
+      <div className="text-white font-medium text-lg"></div>
       <div className="flex items-center space-x-2">
         <span className={`text-sm ${activeKit === "kit1" ? "text-blue-300 font-semibold" : "text-zinc-300"}`}>
           Classic Kit
@@ -665,13 +665,13 @@ const DrumMachine: React.FC<DrumMachineProps> = ({ audioContext, masterGain }) =
   return (
     <Card className="bg-zinc-900/95 border-zinc-700 backdrop-blur-sm">
       <CardHeader className="pb-4">
-        <CardTitle className="text-white text-xl text-center">DRUM KITS</CardTitle>
+        <CardTitle className="text-white text-xl text-center">DRUM MACHINE</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Left side - Kit selector */}
           <div className="lg:w-1/3 space-y-6">
-            <div className="bg-black">
+            <div className="bg-zinc-900/95 border-zinc-700 backdrop-blur-sm"">
               <div className="flex flex-col space-y-4">
                 <CustomToggle />
                 
