@@ -10,14 +10,13 @@ interface LoopRecorderProps {
   masterGain: GainNode | null
 }
 
-
 const SAMPLE_TRACKS = [
   {
     id: 1,
     title: "KING OF EVERYTHING",
     artist: "Wiz K.",
     duration: 120, // 2 minutes
-    url: "https://github.com/sudo-self/mp3-web/blob/4e59b2d5673c433d18edfc2522c7279fa3b97192/Wiz%20Khalifa%20-%20King%20of%20Everything%20%5BOfficial%20Video%5D%20%5B8d0cm_hcQes%5D.mp3",
+    url: "https://github.com/sudo-self/mp3-web/blob/4e59b2d5673c433d18edfc2522c7279fa3b97192/Wiz%20Khalifa%20-%20King%20of%20Everything%20%5BOfficial%20Video%5D%20%5B8d0cm_hcQes%5D.mp3?raw=true", // Added ?raw=true
     color: "from-blue-600 to-indigo-600",
     isSample: true
   },
@@ -26,7 +25,7 @@ const SAMPLE_TRACKS = [
     title: "ENEMIES",
     artist: "Azi Azi Gibson",
     duration: 90, // 1.5 minutes
-    url: "https://github.com/sudo-self/mp3-web/blob/4e59b2d5673c433d18edfc2522c7279fa3b97192/Azizi%20Gibson%20-%20Enemies%20(Prod.%20KAMANDI)%20%5BvUkMSXteHNY%5D.mp3",
+    url: "https://github.com/sudo-self/mp3-web/blob/4e59b2d5673c433d18edfc2522c7279fa3b97192/Azizi%20Gibson%20-%20Enemies%20(Prod.%20KAMANDI)%20%5BvUkMSXteHNY%5D.mp3?raw=true", // Added ?raw=true
     color: "from-purple-600 to-pink-600",
     isSample: true
   }
@@ -42,6 +41,8 @@ interface UploadedTrack {
   file: File
   url: string
 }
+
+type AllTracks = typeof SAMPLE_TRACKS[0] | UploadedTrack
 
 const LoopRecorder: React.FC<LoopRecorderProps> = ({ audioContext, masterGain }) => {
   const [isRecording, setIsRecording] = useState(false)
@@ -61,34 +62,44 @@ const LoopRecorder: React.FC<LoopRecorderProps> = ({ audioContext, masterGain })
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const recordedChunksRef = useRef<Blob[]>([])
   const sourceNodeRef = useRef<AudioBufferSourceNode | null>(null)
-  const recordingTimerRef = useRef<NodeJS.Timeout | null>(null)
+  const recordingTimerRef = useRef<number | null>(null)
   const destinationRef = useRef<MediaStreamAudioDestinationNode | null>(null)
   
   // MP3 Player refs
-  const audioRef = useRef<HTMLAudioElement | null>(null)
-  const progressIntervalRef = useRef<NodeJS.Timeout | null>(null)
+  const audioRef = useRef<HTMLAudioElement>(null)
+  const progressIntervalRef = useRef<number | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // Load first track on mount
+  useEffect(() => {
+    if (SAMPLE_TRACKS.length > 0) {
+      loadTrack(0)
+    }
+  }, [])
 
   useEffect(() => {
     // Initialize audio element
-    if (typeof window !== 'undefined') {
-      audioRef.current = new Audio()
-      audioRef.current.volume = volume
-      
-      audioRef.current.addEventListener('timeupdate', () => {
-        if (audioRef.current) {
-          setCurrentTime(audioRef.current.currentTime)
-        }
-      })
-      
-      audioRef.current.addEventListener('ended', () => {
-        setIsMp3Playing(false)
-        setCurrentTime(0)
-        if (progressIntervalRef.current) {
-          clearInterval(progressIntervalRef.current)
-        }
-      })
+    const audio = new Audio()
+    audio.volume = volume
+    audioRef.current = audio
+    
+    const handleTimeUpdate = () => {
+      if (audioRef.current) {
+        setCurrentTime(audioRef.current.currentTime)
+      }
     }
+    
+    const handleEnded = () => {
+      setIsMp3Playing(false)
+      setCurrentTime(0)
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current)
+        progressIntervalRef.current = null
+      }
+    }
+    
+    audio.addEventListener('timeupdate', handleTimeUpdate)
+    audio.addEventListener('ended', handleEnded)
 
     return () => {
       // Cleanup
@@ -101,6 +112,9 @@ const LoopRecorder: React.FC<LoopRecorderProps> = ({ audioContext, masterGain })
       stopLoop()
       stopMp3()
       
+      audio.removeEventListener('timeupdate', handleTimeUpdate)
+      audio.removeEventListener('ended', handleEnded)
+      
       // Clean up object URLs
       uploadedTracks.forEach(track => {
         if (!track.isSample && track.url.startsWith('blob:')) {
@@ -108,9 +122,13 @@ const LoopRecorder: React.FC<LoopRecorderProps> = ({ audioContext, masterGain })
         }
       })
     }
-  }, [])
+  }, [uploadedTracks])
 
   // MP3 Player functions
+  const getAllTracks = (): AllTracks[] => {
+    return [...SAMPLE_TRACKS, ...uploadedTracks]
+  }
+
   const loadTrack = async (trackIndex: number) => {
     if (!audioRef.current) return
     
@@ -120,18 +138,18 @@ const LoopRecorder: React.FC<LoopRecorderProps> = ({ audioContext, masterGain })
     setCurrentTime(0)
     
     try {
-      const track = getAllTracks()[trackIndex]
-      audioRef.current.src = track.url
-      audioRef.current.load()
+      const tracks = getAllTracks()
+      const track = tracks[trackIndex]
+      
+      if (track) {
+        audioRef.current.src = track.url
+        audioRef.current.load()
+      }
       setIsLoading(false)
     } catch (error) {
       console.error("Error loading track:", error)
       setIsLoading(false)
     }
-  }
-
-  const getAllTracks = () => {
-    return [...SAMPLE_TRACKS, ...uploadedTracks]
   }
 
   const toggleMp3Play = () => {
@@ -144,18 +162,18 @@ const LoopRecorder: React.FC<LoopRecorderProps> = ({ audioContext, masterGain })
     }
   }
 
-  const playMp3 = () => {
+  const playMp3 = async () => {
     if (!audioRef.current) return
     
     try {
-      audioRef.current.play()
+      await audioRef.current.play()
       setIsMp3Playing(true)
       
       // Start progress updates
       if (progressIntervalRef.current) {
         clearInterval(progressIntervalRef.current)
       }
-      progressIntervalRef.current = setInterval(() => {
+      progressIntervalRef.current = window.setInterval(() => {
         if (audioRef.current) {
           setCurrentTime(audioRef.current.currentTime)
         }
@@ -229,17 +247,16 @@ const LoopRecorder: React.FC<LoopRecorderProps> = ({ audioContext, masterGain })
         return
       }
       
-      // Get audio duration
+      // Get audio duration using a Promise-based approach
       const audio = new Audio()
-      audio.src = URL.createObjectURL(file)
-      
-      await new Promise((resolve) => {
+      const duration = await new Promise<number>((resolve, reject) => {
         audio.addEventListener('loadedmetadata', () => {
-          resolve(null)
+          resolve(audio.duration)
         })
+        audio.addEventListener('error', reject)
+        audio.src = URL.createObjectURL(file)
       })
       
-      const duration = audio.duration
       URL.revokeObjectURL(audio.src)
       
       // Create object URL for playback
@@ -352,7 +369,7 @@ const LoopRecorder: React.FC<LoopRecorderProps> = ({ audioContext, masterGain })
 
       // Start timer
       const startTime = Date.now()
-      recordingTimerRef.current = setInterval(() => {
+      recordingTimerRef.current = window.setInterval(() => {
         const elapsed = (Date.now() - startTime) / 1000
         setRecordingTime(elapsed)
 
@@ -430,13 +447,6 @@ const LoopRecorder: React.FC<LoopRecorderProps> = ({ audioContext, masterGain })
     setRecordingTime(0)
     recordedChunksRef.current = []
   }
-
-  // Load first track on mount
-  useEffect(() => {
-    if (SAMPLE_TRACKS.length > 0) {
-      loadTrack(0)
-    }
-  }, [])
 
   const allTracks = getAllTracks()
   const currentTrackData = allTracks[currentTrack] || null
@@ -579,7 +589,7 @@ const LoopRecorder: React.FC<LoopRecorderProps> = ({ audioContext, masterGain })
                     >
                       <div className="text-xs font-semibold mb-1 truncate">{track.title}</div>
                       <div className="text-xs opacity-75 truncate">
-                        {track.artist} {track.isSample ? '' : '(Uploaded)'}
+                        {track.artist} {!track.isSample && '(Uploaded)'}
                       </div>
                     </button>
                     
@@ -609,7 +619,7 @@ const LoopRecorder: React.FC<LoopRecorderProps> = ({ audioContext, masterGain })
                       onClick={() => fileInputRef.current?.click()}
                       className="text-xs border-zinc-600 text-zinc-300 hover:bg-zinc-800"
                     >
-                      Upload your first MP3
+                      ADD MP3s
                     </Button>
                   </div>
                 )}
@@ -735,7 +745,7 @@ const LoopRecorder: React.FC<LoopRecorderProps> = ({ audioContext, masterGain })
                   <span className="text-xs text-amber-400">{uploadedTracks.length} file(s)</span>
                 </div>
                 <div className="text-zinc-400 text-xs">
-                  Uploaded tracks stay in memory until you refresh the page.
+                 in memory until page refresh
                 </div>
               </div>
             )}
