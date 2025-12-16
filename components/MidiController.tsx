@@ -628,7 +628,7 @@ const MidiController: React.FC = () => {
                         ? "bg-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.8)]" 
                         : "bg-purple-500 animate-pulse"
                     }`}></div>
-                    KEYBOARD
+                    PIANO KEYs
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="py-6">
@@ -676,7 +676,7 @@ const MidiController: React.FC = () => {
               <CardHeader className="pb-4 border-b border-zinc-800">
                 <CardTitle className="text-white text-xl flex items-center gap-2">
                   <div className="w-3 h-3 bg-amber-500 rounded-full"></div>
-                  Web Midi ＼（〇_ｏ）／ Music
+                  Midi ＼（〇_ｏ）／ Music
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-6">
@@ -775,7 +775,7 @@ const MidiController: React.FC = () => {
               </a>
               <div className="text-zinc-600 text-sm">•</div>
               <div className="text-zinc-400 text-sm">
-                <span className="text-cyan-400">♫♪</span>source code<span className="text-cyan-400">♫♪</span>
+                <span className="text-cyan-400">♫♪♫♪♫♪</span>s<span className="text-pink-400">♫♪♫♪</span>
               </div>
             </div>
           </div>
