@@ -549,7 +549,7 @@ const MidiController: React.FC = () => {
                 )}
 
                 {/* Sound Effects */}
-                <div className="bg-indigo-800 pt-4">
+                <div className="bg-indigo-600 pt-4 rounded-lg border border-indigo-800/30">
                   <div className="text-center">
                     <div className="text-white text-sm font-medium mb-2">Button EFX</div>
                     <div className="grid grid-cols-2 gap-3">
