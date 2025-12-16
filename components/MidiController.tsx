@@ -293,28 +293,29 @@ const MidiController: React.FC = () => {
     }
   }
 
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-black via-zinc-950 to-black p-4 md:p-6 overflow-x-hidden">
-      <div className="max-w-[1400px] mx-auto space-y-6">
-        {/* Header with DJ-style branding */}
-        <div className="text-center space-y-2">
-          <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-indigo-500/20 to-transparent blur-xl"></div>
-            <h1 className="relative text-4xl md:text-5xl font-bold bg-gradient-to-r from-indigo-400 via-cyan-400 to-purple-400 bg-clip-text text-transparent mb-2">
-              Web Midi Music
-            </h1>
-          </div>
-          
-   <div className="flex items-center justify-center gap-3 text-zinc-300">
-  {/* URL */}
-  <p className="text-sm text-pink-500">web-midi-music.vercel.app</p>
+return (
+  <div className="min-h-screen bg-gradient-to-b from-black via-zinc-950 to-black p-4 md:p-6 overflow-x-hidden">
+    <div className="max-w-[1400px] mx-auto space-y-6">
+      {/* Header with DJ-style branding */}
+      <div className="text-center space-y-2">
+        <div className="relative">
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-indigo-500/20 to-transparent blur-xl"></div>
+          <h1 className="relative text-4xl md:text-5xl font-bold bg-gradient-to-r from-indigo-400 via-cyan-400 to-purple-400 bg-clip-text text-transparent mb-2">
+            Web Midi Music
+          </h1>
+        </div>
 
-  {/* Recording Indicator */}
-  <div className="flex items-center gap-1">
-    <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
-    <span className="text-sm">REC</span>
+        {/* URL and Recording Indicator */}
+        <div className="flex items-center justify-center gap-3">
+          <p className="text-sm text-pink-500">web-midi-music.vercel.app</p>
+          <div className="flex items-center gap-1">
+            <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+            <span className="text-sm text-zinc-300">REC</span>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-</div>
 
 
         {/* Visual Feedback Status Bar */}
