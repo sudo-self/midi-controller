@@ -446,21 +446,6 @@ const MidiController: React.FC = () => {
               <DrumMachine audioContext={audioContext} masterGain={masterGainRef.current} />
             </div>
 
-            {/* Piano Area - Responsive layout */}
-            <div className="flex flex-col md:flex-row gap-4 items-start">
-              {/* Storm visualizer iframe */}
-              <div className="md:w-24 md:mt-4">
-                <iframe 
-                  src="https://storm.jessejesse.com/" 
-                  width="96" 
-                  height="96"
-                  className="border-0 rounded-lg"
-                  title="Storm Visualizer"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                />
-              </div>
-
               {/* Piano container - Now responsive */}
               <div className="flex-1 overflow-x-auto">
                 <div className="relative min-w-[700px]">
