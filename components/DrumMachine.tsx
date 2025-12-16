@@ -897,7 +897,7 @@ const DrumMachine: React.FC<DrumMachineProps> = ({ audioContext, masterGain }) =
         <div className="text-center pt-4 border-t border-zinc-700">
           <p className="text-zinc-400 text-sm">
             Currently using <span className="font-semibold text-white">{activeKit === "kit1" ? "CLASSIC KIT" : "DJ KIT"}</span> • 
-            Use keys <span className="font-mono text-white">1-6</span> 
+            Use keys <span className="font-mono text-white">1-6</span> • 
           </p>
         </div>
       </CardContent>
