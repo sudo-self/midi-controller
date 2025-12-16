@@ -395,7 +395,7 @@ const MidiController: React.FC = () => {
                 {/* Sound Mode Selection */}
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-white text-sm font-medium">MODE SELECT</span>
+                    <span className="text-white text-sm font-medium">MODE</span>
                     <div className="flex gap-1 bg-zinc-800 p-1 rounded-lg">
                       <Button
                         variant="ghost"
