@@ -446,47 +446,38 @@ const MidiController: React.FC = () => {
               <DrumMachine audioContext={audioContext} masterGain={masterGainRef.current} />
             </div>
 
-            {/* Piano and iframe side by side */}
-            <div className="relative flex flex-col lg:flex-row gap-5">
-              {/* Small iframe container - positioned to the left of piano */}
-              <div className="lg:w-auto">
-                <div className="relative h-full">
-                  <div className="absolute -inset-1 bg-gradient-to-r from-purple-500/5 to-pink-500/5 blur-sm rounded-lg"></div>
-                  <div className="relative bg-zinc-900/80 border border-zinc-800/50 rounded-lg p-2 backdrop-blur-sm">
-                    <iframe 
-                      src="https://storm.jessejesse.com/" 
-                      width="180" 
-                      height="180"
-                      className="rounded border-0 w-full"
-                      style={{ minWidth: '180px', minHeight: '180px' }}
-                      title="Storm Visualizer"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    />
-                    <div className="text-center mt-2">
-                      <span className="text-xs text-zinc-400">STORM VISUALIZER</span>
+            {/* Piano */}
+            <div className="relative">
+              <div className="absolute -inset-1 bg-gradient-to-r from-purple-500/10 to-pink-500/10 blur-lg rounded-xl"></div>
+              <Card className="bg-gradient-to-br from-zinc-900/95 to-black border-zinc-800 backdrop-blur-sm">
+                <CardHeader className="pb-4 border-b border-zinc-800">
+                  <CardTitle className="text-white text-xl flex items-center gap-2">
+                    <div className="w-3 h-3 bg-purple-500 rounded-full animate-pulse"></div>
+                    PIANO KEYBOARD
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="py-6">
+                  <div className="flex items-start gap-4">
+                    {/* Small borderless iframe directly to left of piano */}
+                    <div className="hidden md:block">
+                      <iframe 
+                        src="https://storm.jessejesse.com/" 
+                        width="100" 
+                        height="100"
+                        className="border-0 rounded-lg"
+                        title="Storm Visualizer"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                    </div>
+                    
+                    {/* Piano */}
+                    <div className="flex-1">
+                      <Piano onNotePlay={playNote} onNoteStop={stopNote} />
                     </div>
                   </div>
-                </div>
-              </div>
-
-              {/* Piano container */}
-              <div className="lg:flex-1">
-                <div className="relative">
-                  <div className="absolute -inset-1 bg-gradient-to-r from-purple-500/10 to-pink-500/10 blur-lg rounded-xl"></div>
-                  <Card className="bg-gradient-to-br from-zinc-900/95 to-black border-zinc-800 backdrop-blur-sm">
-                    <CardHeader className="pb-4 border-b border-zinc-800">
-                      <CardTitle className="text-white text-xl flex items-center gap-2">
-                        <div className="w-3 h-3 bg-purple-500 rounded-full animate-pulse"></div>
-                        PIANO KEYBOARD
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="flex justify-center py-6">
-                      <Piano onNotePlay={playNote} onNoteStop={stopNote} />
-                    </CardContent>
-                  </Card>
-                </div>
-              </div>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </div>
@@ -546,7 +537,7 @@ const MidiController: React.FC = () => {
                       </li>
                       <li className="flex items-start gap-2">
                         <span className="text-amber-400">▶</span>
-                        <span>Watch the storm visualizer react to music</span>
+                        <span>Watch the storm visualizer beside piano</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <span className="text-amber-400">▶</span>
