@@ -544,7 +544,7 @@ const MidiController: React.FC = () => {
                 {soundMode === "piano" && (
                   <div className="bg-gradient-to-r from-blue-900/20 to-cyan-900/20 p-4 rounded-lg border border-blue-800/30">
                     <p className="text-blue-200 text-xs leading-relaxed">
-                      <strong>PIANO MODE</strong> • Multi-harmonic synthesis with realistic attack and decay characteristics. Perfect for melodic playing.
+                      <strong>PIANO MODE</strong> • Multi-harmonic synthesis with realistic attack and decay for perfect for melodic playback.
                     </p>
                   </div>
                 )}
@@ -552,7 +552,7 @@ const MidiController: React.FC = () => {
                 {/* Sound Effects */}
                 <div className="pt-4">
                   <div className="text-center">
-                    <div className="text-white text-sm font-medium mb-2">Sound Effects</div>
+                    <div className="text-white text-sm font-medium mb-2">Button EFX</div>
                     <div className="grid grid-cols-2 gap-3">
                       <div className="text-center">
                         <div className="text-white text-sm font-medium mb-2">Pew Pew</div>
@@ -582,7 +582,7 @@ const MidiController: React.FC = () => {
                   </div>
                   
                   <div className="text-center mt-2">
-                    <p className="text-zinc-400 text-xs">midi instants</p>
+                    <p className="text-zinc-400 text-xs">web-midi-music</p>
                   </div>
                 </div>
               </CardContent>
@@ -628,7 +628,7 @@ const MidiController: React.FC = () => {
                         ? "bg-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.8)]" 
                         : "bg-purple-500 animate-pulse"
                     }`}></div>
-                    PIANO KEYBOARD
+                    KEYBOARD
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="py-6">
@@ -655,7 +655,7 @@ const MidiController: React.FC = () => {
                       ? "bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.8)]" 
                       : "bg-amber-500"
                   }`}></div>
-                  LOOP RECORDER
+                  RECORDER
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -729,7 +729,7 @@ const MidiController: React.FC = () => {
 
                   {/* Visual Legend */}
                   <div className="bg-zinc-800/30 p-3 rounded-lg">
-                    <h4 className="text-white text-xs font-medium mb-2">VISUAL STATUS</h4>
+                    <h4 className="text-white text-xs font-medium mb-2">Midi Status</h4>
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
                         <div className="w-2 h-2 bg-cyan-500 rounded-full"></div>
@@ -759,7 +759,7 @@ const MidiController: React.FC = () => {
         <div className="text-center py-4 border-t border-zinc-800/50">
           <div className="flex flex-col md:flex-row items-center justify-between gap-3">
             <p className="text-zinc-500 text-sm">
-              WEB MIDI MUSIC • HQ Web Audio API • Visual Feedback System
+             JRs • WEB MIDI MUSIC 
             </p>
             <div className="flex items-center gap-4">
               <a
@@ -775,7 +775,7 @@ const MidiController: React.FC = () => {
               </a>
               <div className="text-zinc-600 text-sm">•</div>
               <div className="text-zinc-400 text-sm">
-                <span className="text-cyan-400">♫♪</span>JRs web-midi-music<span className="text-cyan-400">♫♪</span>
+                <span className="text-cyan-400">♫♪</span>source code<span className="text-cyan-400">♫♪</span>
               </div>
             </div>
           </div>
