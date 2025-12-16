@@ -550,7 +550,7 @@ const MidiController: React.FC = () => {
                 )}
 
                 {/* Sound Effects */}
-                <div className="pt-4">
+                <div className="bg-indigo-800 pt-4">
                   <div className="text-center">
                     <div className="text-white text-sm font-medium mb-2">Button EFX</div>
                     <div className="grid grid-cols-2 gap-3">
@@ -628,7 +628,7 @@ const MidiController: React.FC = () => {
                         ? "bg-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.8)]" 
                         : "bg-purple-500 animate-pulse"
                     }`}></div>
-                    PIANO KEYs
+                    PIANO KEYBOARD
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="py-6">
