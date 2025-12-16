@@ -329,10 +329,10 @@ const DrumMachine: React.FC<DrumMachineProps> = ({ audioContext, masterGain }) =
   }
 
   const createClap = (ctx: AudioContext, destination: AudioNode) => {
-    // Realistic clap sound with multiple noise bursts
+  
     const now = ctx.currentTime
     
-    // Create multiple noise bursts for clap effect
+
     for (let i = 0; i < 3; i++) {
       const noiseBuffer = ctx.createBuffer(1, ctx.sampleRate * 0.05, ctx.sampleRate)
       const data = noiseBuffer.getChannelData(0)
@@ -364,7 +364,7 @@ const DrumMachine: React.FC<DrumMachineProps> = ({ audioContext, masterGain }) =
   }
 
   const createCowbell = (ctx: AudioContext, destination: AudioNode) => {
-    // Metallic cowbell sound
+ 
     const osc1 = ctx.createOscillator()
     const osc2 = ctx.createOscillator()
     const gain = ctx.createGain()
@@ -665,13 +665,13 @@ const DrumMachine: React.FC<DrumMachineProps> = ({ audioContext, masterGain }) =
   return (
     <Card className="bg-zinc-900/95 border-zinc-700 backdrop-blur-sm">
       <CardHeader className="pb-4">
-        <CardTitle className="text-white text-xl text-center">MIDI DRUM KITS</CardTitle>
+        <CardTitle className="text-white text-xl text-center">DRUM KITS</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Left side - Kit selector */}
           <div className="lg:w-1/3 space-y-6">
-            <div className="bg-zinc-800/60 p-4 rounded-lg border border-zinc-700">
+            <div className="bg-black">
               <div className="flex flex-col space-y-4">
                 <CustomToggle />
                 
