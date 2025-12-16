@@ -578,8 +578,8 @@ const MidiController: React.FC = () => {
                     </div>
                   </div>
                   
-                  <div className="text-center mt-2">
-                    <p className="text-zinc-400 text-xs">web-midi-music.vercel.app</p>
+                  <div className="text-center text-black text-md mt-2">
+                    <p className="text-zinc-400 text-xs">WEB MIDI MUSIC</p>
                   </div>
                 </div>
               </CardContent>
