@@ -681,7 +681,7 @@ const MidiController: React.FC = () => {
               <CardContent className="pt-6">
                 <div className="space-y-4">
                   <div className="space-y-3">
-                    <h4 className="text-white font-semibold text-sm">KEY MAPS</h4
+                    <h4 className="text-white font-semibold text-sm">KEY MAPS</h4>
                     <div className="grid grid-cols-2 gap-3">
                       <div className="bg-zinc-800/50 p-3 rounded-lg">
                         <div className="text-cyan-300 text-xs font-semibold mb-1">OCTAVE 1</div>
