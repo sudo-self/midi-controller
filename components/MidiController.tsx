@@ -772,7 +772,7 @@ const MidiController: React.FC = () => {
               </a>
               <div className="text-zinc-600 text-sm">•</div>
               <div className="text-zinc-400 text-sm">
-                <span className="text-cyan-400">♫♪♫♪♫♪</span><span className="text-pink-400">♫♪♫♪</span>
+                <span className="text-cyan-400">♫♪♫</span> JR <span className="text-pink-400">♫♪♫</span>
               </div>
             </div>
           </div>
